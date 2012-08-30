@@ -353,6 +353,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mDevMenuButtonEnabled;
     boolean mDevBackButtonEnabled;
 
+    // Behavior of force navbar development settings
+    boolean mDevMenuButtonEnabled;
+    boolean mDevBackButtonEnabled;
+
     private static final class PointerLocationInputEventReceiver extends InputEventReceiver {
         private final PointerLocationView mView;
 

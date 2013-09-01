@@ -585,6 +585,10 @@ public class WindowManagerService extends IWindowManager.Stub
     // For frozen screen animations.
     int mExitAnimId, mEnterAnimId;
 
+    public void unscheduleAnimationLocked() {
+        mPolicy.unlockUpdateSettings();
+    }
+
     /** Pulled out of performLayoutAndPlaceSurfacesLockedInner in order to refactor into multiple
      * methods. */
     class LayoutFields {
@@ -9324,6 +9328,7 @@ public class WindowManagerService extends IWindowManager.Stub
         if (!mAnimationScheduled) {
             mAnimationScheduled = true;
             mPolicy.windowAnimationStarted();
+            mPolicy.lockUpdateSettings();
             mChoreographer.postCallback(
                     Choreographer.CALLBACK_ANIMATION, mAnimator.mAnimationRunnable, null);
         }

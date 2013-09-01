@@ -1207,4 +1207,7 @@ public interface WindowManagerPolicy {
      * Animating windows has finished
      */
     public void windowAnimationFinished();
+
+    void lockUpdateSettings();
+    void unlockUpdateSettings();
 }

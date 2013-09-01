@@ -341,6 +341,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mIsLongPress;
     private boolean mAnimatingWindows;
     private boolean mNeedUpdateSettings;
+    private boolean mLockUpdateSettings;
+    private boolean mUpdateSettingsScheduled;
 
     // Behavior of force navbar development settings
     boolean mDevMenuButtonEnabled;
@@ -685,6 +687,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 updateSettings();
                 updateRotation(false);
             }
+            if (mLockUpdateSettings) {
+                mUpdateSettingsScheduled = true;
+            } else {
+                updateSettings();
+            }
+            updateRotation(false);
         }
     }
 
@@ -5628,6 +5636,17 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
         return true;
     }
+
+    public void unlockUpdateSettings() {
+        mLockUpdateSettings = false;
+        if (mUpdateSettingsScheduled) {
+            mUpdateSettingsScheduled = false;
+            updateSettings();
+        }
+    };
+    public void lockUpdateSettings() {
+        mLockUpdateSettings = true;
+    };
 
     @Override
     public void windowAnimationStarted() {

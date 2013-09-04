@@ -2539,6 +2539,60 @@ public final class Settings {
         public static final String LOCKSCREEN_TARGETS = "lockscreen_targets";
 
         /**
+         * Whether to display notifications on screen when screen is off
+         * @hide
+         */
+        public static final String ENABLE_ACTIVE_DISPLAY = "enable_active_display";
+
+        /**
+         * Whether to display notification messages around ring
+         * @hide
+         */
+        public static final String ACTIVE_DISPLAY_TEXT = "active_display_text";
+
+        /**
+         * Time to redisplay notifications on screen from when screen turns off, 0 = never redisplay
+         * @hide
+         */
+        public static final String ACTIVE_DISPLAY_REDISPLAY = "active_display_redisplay";
+
+        /**
+         * Brightness of the display when displaying the active display view
+         * @hide
+         */
+        public static final String ACTIVE_DISPLAY_BRIGHTNESS = "active_display_brightness";
+
+        /**
+         * Display active display view when device comes out of the user's pocket, etc...
+         * @hide
+         */
+        public static final String ACTIVE_DISPLAY_POCKET_MODE = "active_display_pocket_mode";
+
+        /**
+         * Whether to include ongoing/non-clearable notifications
+         * @hide
+         */
+        public static final String ACTIVE_DISPLAY_ALL_NOTIFICATIONS = "active_display_all_notifications";
+
+        /**
+         * Whether to display AM/PM after time when in 12h format
+         * @hide
+         */
+        public static final String ACTIVE_DISPLAY_SHOW_AMPM = "active_display_show_ampm";
+
+        /**
+         * Whether to display the date above the time
+         * @hide
+         */
+        public static final String ACTIVE_DISPLAY_SHOW_DATE = "active_display_show_date";
+
+       /**
+         * Whether to invert the colors when in bright light
+         * @hide
+         */
+        public static final String ACTIVE_DISPLAY_SUNLIGHT_MODE = "active_display_sunlight_mode";
+
+        /**
         * Whether music controls should be shown on the lockscreen if a supporting
         * music player is active.
         * @hide
@@ -2645,6 +2699,55 @@ public final class Settings {
          * @hide
          */
         public static final String POINTER_SPEED = "pointer_speed";
+
+        /**
+	 * Use Dithering for the Wallpaper
+	 * @hide
+	 */
+	public static final String ALEX_WALLPAPER_USE_DITHER = "alex_wallpaper_use_dither";
+
+	/**
+	 * Use custom Pixelformat for Wallpaper
+	 * @hide
+	 */
+	public static final String ALEX_WALLPAPER_PIXELFORMAT_565 = "alex_wallpaper_pixelformat_565";
+
+	/**
+	 * Show hot reboot in reboot menu.
+	 * @hide
+	 */
+	public static final String HOT_REBOOT = "power_menu_hot_reboot_enabled";
+
+        /**
+         * HALO, should default to 0 (no, do not show)
+         * @hide
+         */
+        public static final String HALO_ACTIVE = "halo_active";
+
+        /**
+         * HALO reversed?, should default to 1 (yes, reverse)
+         * @hide
+         */
+        public static final String HALO_REVERSED = "halo_reversed";
+
+        /**
+         * HALO hide?, should default to 0 (no, do not hide)
+         * @hide
+         */
+        public static final String HALO_HIDE = "halo_hide";
+
+         /**
+         * HALO size fraction, default is 1.0f (normal)
+         * @hide
+         */
+        public static final String HALO_SIZE = "halo_size";
+
+        /**
+        * HALO pause activities?, defaults to 0 (no, do not pause) on devices which isLargeRAM() == true
+        * otherwise it defaults to 1 (yes, do pause)
+        * @hide
+        */
+        public static final String HALO_PAUSE = "halo_pause";
 
         /**
          * Whether to enable pie controls?
@@ -2795,6 +2898,30 @@ public final class Settings {
         public static final String EXPANDED_RING_MODE = "expanded_ring_mode";
 
         /**
+         * Developer options - Navigation Bar show switch
+         * @hide
+         */
+        public static final String DEV_FORCE_SHOW_NAVBAR = "dev_force_show_navbar";
+
+        /**
+         * Developer options - Menu button enable override
+         * @hide
+         */
+        public static final String DEV_MENU_BUTTON_ENABLED = "menu_button_enabled";
+
+        /**
+         * Developer options - Back button enable override
+         * @hide
+         */
+        public static final String DEV_BACK_BUTTON_ENABLED = "back_button_enabled";
+
+        /**
+        * Notification Power Widget - Custom Brightness Mode
+        * @hide
+        */
+
+        public static final String EXPANDED_BRIGHTNESS_MODE = "expanded_brightness_mode";
+        /**
         * AutoHide CombinedBar on tablets.
         * @hide
         */
@@ -2867,6 +2994,12 @@ public final class Settings {
         public static final int STATUS_BAR_COLLAPSE_IF_EMPTIED = 1;
         /** @hide */
         public static final int STATUS_BAR_COLLAPSE_IF_NO_CLEARABLE = 2;
+
+       /**
+        * Whether fcharge is enabled or not if kernel supports it
+        * @hide
+        */
+        public static final String FCHARGE_ENABLED = "fcharge_enabled";
 
          /**
          * Expanded desktop on/off state
@@ -3027,6 +3160,32 @@ public final class Settings {
          * @hide
          */
         public static final String STATUS_BAR_NOTIF_COUNT = "status_bar_notif_count";
+
+        /**
+         * Whether to show the battery bar
+         * @hide
+         */
+        public static final String STATUSBAR_BATTERY_BAR = "statusbar_battery_bar";
+
+        /**
+         * @hide
+         */
+        public static final String STATUSBAR_BATTERY_BAR_COLOR = "statusbar_battery_bar_color";
+
+        /**
+         * @hide
+         */
+        public static final String STATUSBAR_BATTERY_BAR_THICKNESS = "statusbar_battery_bar_thickness";
+
+        /**
+         * @hide
+         */
+        public static final String STATUSBAR_BATTERY_BAR_STYLE = "statusbar_battery_bar_style";
+
+        /**
+         * @hide
+         */
+        public static final String STATUSBAR_BATTERY_BAR_ANIMATE = "statusbar_battery_bar_animate";
 
         /**
          * Show the pending notification counts as overlays on the status bar
@@ -3272,6 +3431,18 @@ public final class Settings {
          * @hide
          */
         public static final String VOLUME_KEYS_CONTROL_RING_STREAM = "volume_keys_control_ring_stream";
+
+        /**
+         * Give MMS Notifications a breathing effect
+         * @hide
+         */
+        public static final String MISSED_CALL_BREATH = "missed_call_breath";
+
+        /**
+         * Give SMS Notifications a breathing effect
+         * @hide
+         */
+        public static final String SMS_BREATH = "pref_key_sms_breath";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
@@ -5241,7 +5412,8 @@ public final class Settings {
             DIALPAD_AUTOCOMPLETE,
             LOCK_SCREEN_OWNER_INFO,
             LOCK_SCREEN_OWNER_INFO_ENABLED,
-            ADVANCED_REBOOT
+            ADVANCED_REBOOT,
+            PRIVACY_GUARD_DEFAULT
         };
 
         /**

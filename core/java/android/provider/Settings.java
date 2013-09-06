@@ -5241,7 +5241,8 @@ public final class Settings {
             DIALPAD_AUTOCOMPLETE,
             LOCK_SCREEN_OWNER_INFO,
             LOCK_SCREEN_OWNER_INFO_ENABLED,
-            ADVANCED_REBOOT
+            ADVANCED_REBOOT,
+            PRIVACY_GUARD_DEFAULT
         };
 
         /**

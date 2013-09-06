@@ -290,6 +290,11 @@ final class ActivityStack {
     boolean mDismissKeyguardOnNextActivity = false;
 
     /**
+     * Is the privacy guard currently enabled?
+     */
+    String mPrivacyGuardPackageName = null;
+
+    /**
      * Save the most recent screenshot for reuse. This keeps Recents from taking two identical
      * screenshots, one for the Recents thumbnail and one for the pauseActivity thumbnail.
      */
@@ -1280,6 +1285,7 @@ final class ActivityStack {
         } else {
             next.cpuTimeAtResume = 0; // Couldn't get the cpu time of process
         }
+        updatePrivacyGuardNotificationLocked(next);
     }
 
     /**

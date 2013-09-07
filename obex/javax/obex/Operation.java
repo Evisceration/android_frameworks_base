@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2013, The Linux Foundation. All rights reserved.
  * Copyright (c) 2008-2009, Motorola, Inc.
  *
  * All rights reserved.
@@ -176,9 +175,9 @@ public interface Operation {
 
     DataOutputStream openDataOutputStream() throws IOException;
 
-    void close() throws IOException;
-
     void noEndofBody();
+
+    void close() throws IOException;
 
     int getMaxPacketSize();
 }

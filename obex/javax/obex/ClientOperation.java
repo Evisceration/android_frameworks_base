@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2013, The Linux Foundation. All rights reserved.
- * Copyright (c) 2008-2009, Motorola, Inc.
+ * Copyright (c) 2010-2011, Motorola, Inc.
  *
  * All rights reserved.
  *
@@ -123,6 +122,12 @@ public final class ClientOperation implements Operation, BaseStream {
             mRequestHeader.mAuthResp = new byte[(header).mAuthResp.length];
             System.arraycopy((header).mAuthResp, 0, mRequestHeader.mAuthResp, 0,
                     (header).mAuthResp.length);
+
+        }
+        if ((header).mConnectionID != null) {
+            mRequestHeader.mConnectionID = new byte[4];
+            System.arraycopy((header).mConnectionID, 0, mRequestHeader.mConnectionID, 0,
+                    4);
 
         }
     }
@@ -755,6 +760,7 @@ public final class ClientOperation implements Operation, BaseStream {
             }
         }
     }
+
     public void noEndofBody() {
 
     }

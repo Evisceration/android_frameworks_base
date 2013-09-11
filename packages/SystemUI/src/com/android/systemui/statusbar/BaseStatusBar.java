@@ -53,6 +53,9 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
@@ -981,11 +984,11 @@ public abstract class BaseStatusBar extends SystemUI implements
         return new NotificationClicker(intent, pkg, tag, id);
     }
 
-    private class NotificationClicker implements View.OnClickListener {
-        private PendingIntent mIntent;
-        private String mPkg;
-        private String mTag;
-        private int mId;
+    public class NotificationClicker implements View.OnClickListener {
+        public PendingIntent mIntent;
+        public String mPkg;
+        public String mTag;
+        public int mId;
         public boolean mFloat;
 
         NotificationClicker(PendingIntent intent, String pkg, String tag, int id) {
@@ -1462,5 +1465,13 @@ public abstract class BaseStatusBar extends SystemUI implements
         if (mPieController != null) {
             mPieController.updatePieTriggerMask(newMask);
         }
+    }
+
+    public NotificationData getNotificationData() {
+        return mNotificationData;
+    }
+
+    public IStatusBarService getService() {
+        return mBarService;
     }
 }

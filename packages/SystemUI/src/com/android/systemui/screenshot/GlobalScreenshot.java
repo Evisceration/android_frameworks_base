@@ -58,6 +58,7 @@ import android.view.animation.Interpolator;
 import android.widget.ImageView;
 
 import com.android.systemui.R;
+import com.android.systemui.screenshot.TrashScreenshot;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -220,18 +221,29 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
             sharingIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
 
             Intent chooserIntent = Intent.createChooser(sharingIntent, null);
-            chooserIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK 
+            chooserIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
                     | Intent.FLAG_ACTIVITY_NEW_TASK);
 
             mNotificationBuilder.addAction(R.drawable.ic_menu_share,
                      r.getString(com.android.internal.R.string.share),
-                     PendingIntent.getActivity(context, 0, chooserIntent, 
+                     PendingIntent.getActivity(context, 0, chooserIntent,
                              PendingIntent.FLAG_CANCEL_CURRENT));
+
+            // ScreenShot QuickTrash starts here
+            Intent trashIntent = new Intent();
+            trashIntent.setClass(context, TrashScreenshot.class);
+            trashIntent.putExtra(TrashScreenshot.SCREENSHOT_URI, uri.toString());
+
+            mNotificationBuilder.addAction(R.drawable.ic_menu_trash,
+                     r.getString(R.string.trash),
+                     PendingIntent.getBroadcast(context, 0, trashIntent,
+                        PendingIntent.FLAG_CANCEL_CURRENT));
 
             OutputStream out = resolver.openOutputStream(uri);
             image.compress(Bitmap.CompressFormat.PNG, 100, out);
             out.flush();
             out.close();
+            // Ends Here
 
             // update file size in the database
             values.clear();
@@ -302,7 +314,7 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
 class GlobalScreenshot {
     private static final String TAG = "GlobalScreenshot";
 
-    private static final int SCREENSHOT_NOTIFICATION_ID = 789;
+    public static final int SCREENSHOT_NOTIFICATION_ID = 789;
     private static final int SCREENSHOT_FLASH_TO_PEAK_DURATION = 130;
     private static final int SCREENSHOT_DROP_IN_DURATION = 430;
     private static final int SCREENSHOT_DROP_OUT_DELAY = 500;

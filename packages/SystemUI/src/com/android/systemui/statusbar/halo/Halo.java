@@ -389,7 +389,6 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
             if (!mInteractionReversed) {
                 mState = State.GESTURES;
                 mEffect.wake();
-                mBar.setHaloTaskerActive(true, true);
             } else {
                 // Move
                 mState = State.DRAG;
@@ -453,7 +452,6 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
                     if (hiddenState) break;
 
                     resetIcons();
-                    mBar.setHaloTaskerActive(false, true);
                     mEffect.setHaloOverlay(HaloProperties.Overlay.NONE, 0f);
                     updateTriggerPosition(mEffect.getHaloX(), mEffect.getHaloY());
 
@@ -567,7 +565,6 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
                                 if (mInteractionReversed) {
                                     mState = State.GESTURES;
                                     mEffect.wake();
-                                    mBar.setHaloTaskerActive(true, true);
                                 } else {
                                     mState = State.DRAG;
                                     mEffect.intro();
@@ -698,8 +695,6 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
         mHandler.removeCallbacksAndMessages(null);
         // Kill callback
         mBar.getTicker().setUpdateEvent(null);
-        // Flag tasker
-        mBar.setHaloTaskerActive(false, false);
         // Kill the effect layer
         if (mEffect != null) mWindowManager.removeView(mEffect);
         // Remove resolver

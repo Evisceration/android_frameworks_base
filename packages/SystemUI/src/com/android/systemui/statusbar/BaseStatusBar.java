@@ -410,24 +410,9 @@ public abstract class BaseStatusBar extends SystemUI implements
         updateHalo();
     }
 
-    public void setHaloTaskerActive(boolean haloTaskerActive, boolean updateNotificationIcons) {
-        mHaloTaskerActive = haloTaskerActive;
-        if (updateNotificationIcons) {
-            updateNotificationIcons();
-        }
-    }
-
-    protected void updateHaloButton() {
-        if (mHaloButton != null) {
-            mHaloButton.setVisibility(mHaloButtonVisible && !mHaloActive ? View.VISIBLE : View.GONE);
-        }
-    }
-
     protected void updateHalo() {
         mHaloActive = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.HALO_ACTIVE, 0) == 1;
-
-        updateHaloButton();
 
         if (mHaloActive) {
             if (mHalo == null) {

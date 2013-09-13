@@ -35,6 +35,8 @@ public class BootReceiver extends BroadcastReceiver {
         try {
             // Start the load average overlay, if activated
             ContentResolver res = context.getContentResolver();
+            //Disable HALO on startup
+            Settings.System.putInt(res, Settings.System.HALO_ACTIVE, 0);
             if (Settings.Global.getInt(res, Settings.Global.SHOW_PROCESSES, 0) != 0) {
                 Intent loadavg = new Intent(context, com.android.systemui.LoadAverageService.class);
                 context.startService(loadavg);

@@ -29,6 +29,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.provider.Settings;
 import android.util.Slog;
 import android.view.IWindowManager;
 import android.view.WindowManagerGlobal;
@@ -69,6 +70,8 @@ public class SystemUIService extends Service {
 
     @Override
     public void onCreate() {
+	//Disable HALO on startup
+        Settings.System.putInt(getContentResolver(), Settings.System.HALO_ACTIVE, 0);
         // Tell the accessibility layer that this process will
         // run as the current user, i.e. run across users.
         AccessibilityManager.createAsSharedAcrossUsers(this);

@@ -57,11 +57,11 @@ public class HaloTile extends QuickSettingsTile {
 	if(getEnabled())
             // If enabled
             mLabel = mContext.getString(R.string.quick_settings_halo_enabled_label);
-            mDrawable = R.drawable.ic_qs_network_adb_off;
+            mDrawable = R.drawable.ic_qs_halo_on;
         } else {
             // Otherwise set the disabled label and icon
             mLabel = mContext.getString(R.string.quick_settings_halo_disabled_label);
-            mDrawable = R.drawable.ic_qs_network_adb_off;
+            mDrawable = R.drawable.ic_qs_halo_off;
         }
     }
 

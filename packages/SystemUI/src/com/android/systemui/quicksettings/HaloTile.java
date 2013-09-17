@@ -26,19 +26,11 @@ public class HaloTile extends QuickSettingsTile {
         mOnClick = new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Settings.Secure.putInt(mContext.getContentResolver(), Settings.System.HALO_ACTIVE, !getEnabled() ? 1 : 0);
+                Settings.System.putInt(mContext.getContentResolver(), Settings.System.HALO_ACTIVE, !getEnabled() ? 1 : 0);
             }
         };
 
-        /*mOnLongClick = new OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                startSettingsActivity(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS);
-                return true;
-            }
-        };*/
-
-        qsc.registerObservedContent(Settings.Secure.getUriFor(Settings.System.HALO_ACTIVE), this);
+        qsc.registerObservedContent(Settings.System.getUriFor(Settings.System.HALO_ACTIVE), this);
         updateResources();
     }
 
@@ -54,7 +46,7 @@ public class HaloTile extends QuickSettingsTile {
     }
 
     private synchronized void updateTile() {
-	if(getEnabled())
+	if (getEnabled()) {
             // If enabled
             mLabel = mContext.getString(R.string.quick_settings_halo_enabled_label);
             mDrawable = R.drawable.ic_qs_halo_on;

@@ -37,6 +37,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.RemoteException;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.LogPrinter;
 import android.view.Display;

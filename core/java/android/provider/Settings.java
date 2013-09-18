@@ -2647,6 +2647,18 @@ public final class Settings {
         public static final String POINTER_SPEED = "pointer_speed";
 
         /**
+	 * Use Dithering for the Wallpaper
+	 * @hide
+	 */
+	public static final String ALEX_WALLPAPER_USE_DITHER = "alex_wallpaper_use_dither";
+
+	/**
+	 * Use custom Pixelformat for Wallpaper
+	 * @hide
+	 */
+	public static final String ALEX_WALLPAPER_PIXELFORMAT_565 = "alex_wallpaper_pixelformat_565";
+
+        /**
          * HALO, should default to 0 (no, do not show)
          * @hide
          */

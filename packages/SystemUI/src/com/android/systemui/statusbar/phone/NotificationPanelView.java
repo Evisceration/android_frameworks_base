@@ -146,6 +146,10 @@ public class NotificationPanelView extends PanelView {
                             Settings.System.getIntForUser(getContext().getContentResolver(),
                                     Settings.System.QS_QUICK_PULLDOWN, 0, UserHandle.USER_CURRENT) == 2) {
                         flip = true;
+                    } else if (!mStatusBar.hasClearableNotifications() &&
+                            Settings.System.getInt(getContext().getContentResolver(),
+                                    Settings.System.QS_QUICK_PULLDOWN, 0) == 3) {
+                        flip = true;
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:

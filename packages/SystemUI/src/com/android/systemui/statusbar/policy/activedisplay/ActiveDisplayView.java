@@ -750,8 +750,6 @@ public class ActiveDisplayView extends FrameLayout {
     private void registerSensorListener() {
         if (mProximitySensor != null)
             mSensorManager.registerListener(mSensorListener, mProximitySensor, SensorManager.SENSOR_DELAY_UI);
-        if (mLightSensor != null)
-            mSensorManager.registerListener(mSensorListener, mLightSensor, SensorManager.SENSOR_DELAY_UI);
     }
 
     private void unregisterSensorListener() {

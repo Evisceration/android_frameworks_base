@@ -1912,6 +1912,7 @@
   <java-symbol type="string" name="reboot_progress" />
   <java-symbol type="array" name="shutdown_reboot_options" />
   <java-symbol type="array" name="shutdown_reboot_actions" />
+  <java-symbol type="array" name="shutdown_hot_reboot_options" />
   <java-symbol type="drawable" name="ic_lock_screenshot" />
   <java-symbol type="drawable" name="ic_lock_reboot" />
   <java-symbol type="drawable" name="ic_lock_profile" />

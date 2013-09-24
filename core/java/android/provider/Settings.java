@@ -2712,6 +2712,12 @@ public final class Settings {
 	 */
 	public static final String ALEX_WALLPAPER_PIXELFORMAT_565 = "alex_wallpaper_pixelformat_565";
 
+	/**
+	 * Show hot reboot in reboot menu.
+	 * @hide
+	 */
+	public static final String HOT_REBOOT = "power_menu_hot_reboot_enabled";
+
         /**
          * HALO, should default to 0 (no, do not show)
          * @hide

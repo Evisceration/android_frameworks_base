@@ -19,6 +19,13 @@
     <!-- Defines the shutdown options shown in the reboot dialog. -->
     <array name="shutdown_reboot_options" translatable="false">
         <item>@string/reboot_reboot</item>
+        <item>@string/reboot_recovery</item>
+        <item>@string/reboot_bootloader</item>
+    </array>
+
+    <!-- Defines the shutdown options shown in the reboot dialog with hot reboot -->
+    <array name="shutdown_hot_reboot_options" translatable="false">
+        <item>@string/reboot_reboot</item>
 	<item>@string/reboot_hot</item>
         <item>@string/reboot_recovery</item>
         <item>@string/reboot_bootloader</item>

@@ -165,7 +165,8 @@ public final class ShutdownThread extends Thread {
                     // Include options in power menu for rebooting into recovery or bootloader
                     sConfirmDialog = new AlertDialog.Builder(context)
                             .setTitle(titleResourceId)
-                            .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options, 0, new DialogInterface.OnClickListener() {
+                            .setSingleChoiceItems((Settings.System.getInt(context.getContentResolver(),
+                Settings.System.HOT_REBOOT, 0) == 1) ? com.android.internal.R.array.shutdown_hot_reboot_options : com.android.internal.R.array.shutdown_reboot_options, 0, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     if (which < 0)
                                         return;

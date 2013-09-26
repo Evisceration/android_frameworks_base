@@ -1,0 +1,5 @@
+packages/SystemUI/SystemUI.iml
+packages/SystemUI/gen/
+packages/SystemUI/tests/gen/
+packages/SystemUI/tests/tests.iml
+packages/SystemUI/bin/

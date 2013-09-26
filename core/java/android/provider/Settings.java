@@ -2701,6 +2701,12 @@ public final class Settings {
         public static final String POINTER_SPEED = "pointer_speed";
 
         /**
+	 * Use new tabbed Settings Appearance instead of the List one
+	 * @hide
+	 */
+	public static final String ALEX_EXTRA_USE_NEW_SETTINGS = "alex_extra_use_new_settings";
+
+        /**
 	 * Use Dithering for the Wallpaper
 	 * @hide
 	 */

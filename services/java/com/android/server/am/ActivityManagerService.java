@@ -1484,6 +1484,7 @@ public final class ActivityManagerService  extends ActivityManagerNative
                 } catch (RemoteException e) {
                 }
             } break;
+	    }
         }
     };
 
@@ -1702,7 +1703,7 @@ public final class ActivityManagerService  extends ActivityManagerNative
         }
     }
 
-    private ActivityManagerService() {
+    public ActivityManagerService() {
         Slog.i(TAG, "Memory class: " + ActivityManager.staticGetMemoryClass());
         
         mFgBroadcastQueue = new BroadcastQueue(this, "foreground", BROADCAST_FG_TIMEOUT);

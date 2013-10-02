@@ -16,8 +16,6 @@
 
 package com.android.systemui.statusbar.policy;
 
-import java.util.ArrayList;
-
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -33,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.systemui.R;
+
+import java.util.ArrayList;
 
 public class BatteryController extends BroadcastReceiver {
     private static final String TAG = "StatusBar.BatteryController";
@@ -52,7 +52,8 @@ public class BatteryController extends BroadcastReceiver {
      */
     public static final int BATTERY_STYLE_CIRCLE         = 2;
     public static final int BATTERY_STYLE_CIRCLE_PERCENT = 3;
-    public static final int BATTERY_STYLE_GONE           = 4;
+    public static final int BATTERY_STYLE_BAR            = 4;
+    public static final int BATTERY_STYLE_GONE           = 5;
 
 
     private static final int BATTERY_TEXT_STYLE_NORMAL  = R.string.status_bar_settings_battery_meter_format;

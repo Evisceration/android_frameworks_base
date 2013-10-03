@@ -31,7 +31,7 @@ import java.util.ArrayList;
 /**
  * Utility class for constructing synthetic back stacks for cross-task navigation
  * on Android 3.0 and newer.
- *
+ * <p/>
  * <p>In API level 11 (Android 3.0/Honeycomb) the recommended conventions for
  * app navigation using the back key changed. The back key's behavior is local
  * to the current task and does not capture navigation across different tasks.
@@ -39,15 +39,15 @@ import java.util.ArrayList;
  * through the "recents" UI, accessible through the software-provided Recents key
  * on the navigation or system bar. On devices with the older hardware button configuration
  * the recents UI can be accessed with a long press on the Home key.</p>
- *
+ * <p/>
  * <p>When crossing from one task stack to another post-Android 3.0,
  * the application should synthesize a back stack/history for the new task so that
  * the user may navigate out of the new task and back to the Launcher by repeated
  * presses of the back key. Back key presses should not navigate across task stacks.</p>
- *
+ * <p/>
  * <p>TaskStackBuilder provides a way to obey the correct conventions
  * around cross-task navigation.</p>
- *
+ * <p/>
  * <div class="special reference">
  * <h3>About Navigation</h3>
  * For more detailed information about tasks, the back stack, and navigation design guidelines,
@@ -62,6 +62,7 @@ public class TaskStackBuilder {
 
     private final ArrayList<Intent> mIntents = new ArrayList<Intent>();
     private final Context mSourceContext;
+    private boolean mFirstTaskOnHome = true;
 
     private TaskStackBuilder(Context a) {
         mSourceContext = a;
@@ -76,6 +77,10 @@ public class TaskStackBuilder {
      */
     public static TaskStackBuilder create(Context context) {
         return new TaskStackBuilder(context);
+    }
+
+    public void setTaskOnHome(boolean firstTaskOnHome) {
+        mFirstTaskOnHome = firstTaskOnHome;
     }
 
     /**
@@ -93,7 +98,7 @@ public class TaskStackBuilder {
     /**
      * Add a new Intent with the resolved chain of parents for the target activity to
      * the task stack.
-     *
+     * <p/>
      * <p>This is equivalent to calling {@link #addParentStack(ComponentName) addParentStack}
      * with the resolved ComponentName of nextIntent (if it can be resolved), followed by
      * {@link #addNextIntent(Intent) addNextIntent} with nextIntent.</p>
@@ -210,6 +215,7 @@ public class TaskStackBuilder {
 
     /**
      * Start the task stack constructed by this builder.
+     *
      * @hide
      */
     public void startActivities(Bundle options, UserHandle userHandle) {
@@ -225,8 +231,8 @@ public class TaskStackBuilder {
      * Start the task stack constructed by this builder.
      *
      * @param options Additional options for how the Activity should be started.
-     * See {@link android.content.Context#startActivity(Intent, Bundle)
-     * Context.startActivity(Intent, Bundle)} for more details.
+     *                See {@link android.content.Context#startActivity(Intent, Bundle)
+     *                Context.startActivity(Intent, Bundle)} for more details.
      */
     public void startActivities(Bundle options) {
         startActivities(options, new UserHandle(UserHandle.myUserId()));
@@ -236,12 +242,11 @@ public class TaskStackBuilder {
      * Obtain a {@link PendingIntent} for launching the task constructed by this builder so far.
      *
      * @param requestCode Private request code for the sender
-     * @param flags May be {@link PendingIntent#FLAG_ONE_SHOT},
-     *              {@link PendingIntent#FLAG_NO_CREATE}, {@link PendingIntent#FLAG_CANCEL_CURRENT},
-     *              {@link PendingIntent#FLAG_UPDATE_CURRENT}, or any of the flags supported by
-     *              {@link Intent#fillIn(Intent, int)} to control which unspecified parts of the
-     *              intent that can be supplied when the actual send happens.
-     *
+     * @param flags       May be {@link PendingIntent#FLAG_ONE_SHOT},
+     *                    {@link PendingIntent#FLAG_NO_CREATE}, {@link PendingIntent#FLAG_CANCEL_CURRENT},
+     *                    {@link PendingIntent#FLAG_UPDATE_CURRENT}, or any of the flags supported by
+     *                    {@link Intent#fillIn(Intent, int)} to control which unspecified parts of the
+     *                    intent that can be supplied when the actual send happens.
      * @return The obtained PendingIntent
      */
     public PendingIntent getPendingIntent(int requestCode, int flags) {
@@ -252,15 +257,14 @@ public class TaskStackBuilder {
      * Obtain a {@link PendingIntent} for launching the task constructed by this builder so far.
      *
      * @param requestCode Private request code for the sender
-     * @param flags May be {@link PendingIntent#FLAG_ONE_SHOT},
-     *              {@link PendingIntent#FLAG_NO_CREATE}, {@link PendingIntent#FLAG_CANCEL_CURRENT},
-     *              {@link PendingIntent#FLAG_UPDATE_CURRENT}, or any of the flags supported by
-     *              {@link Intent#fillIn(Intent, int)} to control which unspecified parts of the
-     *              intent that can be supplied when the actual send happens.
-     * @param options Additional options for how the Activity should be started.
-     * See {@link android.content.Context#startActivity(Intent, Bundle)
-     * Context.startActivity(Intent, Bundle)} for more details.
-     *
+     * @param flags       May be {@link PendingIntent#FLAG_ONE_SHOT},
+     *                    {@link PendingIntent#FLAG_NO_CREATE}, {@link PendingIntent#FLAG_CANCEL_CURRENT},
+     *                    {@link PendingIntent#FLAG_UPDATE_CURRENT}, or any of the flags supported by
+     *                    {@link Intent#fillIn(Intent, int)} to control which unspecified parts of the
+     *                    intent that can be supplied when the actual send happens.
+     * @param options     Additional options for how the Activity should be started.
+     *                    See {@link android.content.Context#startActivity(Intent, Bundle)
+     *                    Context.startActivity(Intent, Bundle)} for more details.
      * @return The obtained PendingIntent
      */
     public PendingIntent getPendingIntent(int requestCode, int flags, Bundle options) {
@@ -277,7 +281,7 @@ public class TaskStackBuilder {
      * @hide
      */
     public PendingIntent getPendingIntent(int requestCode, int flags, Bundle options,
-            UserHandle user) {
+                                          UserHandle user) {
         if (mIntents.isEmpty()) {
             throw new IllegalStateException(
                     "No intents added to TaskStackBuilder; cannot getPendingIntent");
@@ -298,9 +302,16 @@ public class TaskStackBuilder {
         Intent[] intents = new Intent[mIntents.size()];
         if (intents.length == 0) return intents;
 
-        intents[0] = new Intent(mIntents.get(0)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+        Intent newIntent = new Intent(mIntents.get(0));
+        newIntent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        if (mFirstTaskOnHome) {
+            newIntent.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+        }
+
+        intents[0] = newIntent;
         for (int i = 1; i < intents.length; i++) {
             intents[i] = new Intent(mIntents.get(i));
         }

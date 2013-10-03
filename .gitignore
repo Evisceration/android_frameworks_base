@@ -1,0 +1,4 @@
+packages/SystemUI/gen/
+packages/SystemUI/tests/
+*.iml
+gen/

@@ -386,7 +386,7 @@ public class ActivityManager {
 
         if(SystemProperties.get(Settings.System.USE_HIGHEND_GFX).equals("0")){
             return false;
-        }
+	}
 
         MemInfoReader reader = new MemInfoReader();
         reader.readMemInfo();

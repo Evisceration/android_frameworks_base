@@ -3654,6 +3654,13 @@ public final class Settings {
          */
         public static final String PERFORMANCE_PROFILE = "performance_profile";
 
+	/*
+         * Force use Highend GFX Effects / Hardware Acceleration
+         *
+         * @hide
+         */
+        public static final String USE_HIGHEND_GFX = "velox.highend.gfx";
+
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.

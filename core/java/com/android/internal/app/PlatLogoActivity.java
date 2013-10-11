@@ -64,12 +64,12 @@ public class PlatLogoActivity extends Activity {
         lp.gravity = Gravity.CENTER_HORIZONTAL;
         lp.bottomMargin = (int) (-4*metrics.density);
 
-        String cmVersion = SystemProperties.get("ro.modversion");
-        if (cmVersion != null) {
-            cmVersion = cmVersion.split("-")[cmVersion.split("-").length - 1];
+        String modVersion = SystemProperties.get("ro.modversion");
+        if (modVersion != null) {
+            modVersion = modVersion.split("-")[modVersion.split("-").length - 1];
         }
 
-        cmVersion = "Version " + cmVersion;
+        modVersion = "Version " + modVersion;
 
         TextView tv = new TextView(this);
         if (light != null) tv.setTypeface(light);
@@ -84,7 +84,7 @@ public class PlatLogoActivity extends Activity {
         tv.setTextSize(size);
         tv.setTextColor(0xFFFFFFFF);
         tv.setShadowLayer(4*metrics.density, 0, 2*metrics.density, 0x66000000);
-        tv.setText(mIsCid ? cmVersion : "JELLY BEAN");
+        tv.setText(mIsCid ? modVersion : "JELLY BEAN");
         view.addView(tv, lp);
 
         return view;

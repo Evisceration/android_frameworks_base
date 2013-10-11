@@ -30,6 +30,9 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Paint.Align;
+import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.UserHandle;
@@ -81,18 +84,21 @@ public class GlowPadView extends View {
 
     /**
      * Number of customizable lockscreen targets for tablets
+     *
      * @hide
      */
     public final static int MAX_TABLET_TARGETS = 7;
 
     /**
      * Number of customizable lockscreen targets for phones
+     *
      * @hide
      */
     public final static int MAX_PHONE_TARGETS = 4;
 
     /**
      * Empty target used to reference unused lockscreen targets
+     *
      * @hide
      */
     public final static String EMPTY_TARGET = "empty";
@@ -103,10 +109,15 @@ public class GlowPadView extends View {
     public interface OnTriggerListener {
         int NO_HANDLE = 0;
         int CENTER_HANDLE = 1;
+
         public void onGrabbed(View v, int handle);
+
         public void onReleased(View v, int handle);
+
         public void onTrigger(View v, int target);
+
         public void onGrabbedStateChange(View v, int handle);
+
         public void onFinishFinalAnimation();
     }
 
@@ -138,6 +149,8 @@ public class GlowPadView extends View {
     private TargetDrawable mHandleDrawable;
     private TargetDrawable mOuterRing;
     private Vibrator mVibrator;
+
+    private TargetDrawable mCenterDrawable;
 
     private int mFeedbackCount = 3;
     private int mVibrationDuration = 0;
@@ -193,7 +206,9 @@ public class GlowPadView extends View {
         public void setSuspended(boolean suspend) {
             mSuspended = suspend;
         }
-    };
+    }
+
+    ;
 
     private AnimatorListener mResetListener = new AnimatorListenerAdapter() {
         public void onAnimationEnd(Animator animator) {
@@ -267,6 +282,8 @@ public class GlowPadView extends View {
         TypedValue handle = a.peekValue(R.styleable.GlowPadView_handleDrawable);
         mHandleDrawable = new TargetDrawable(res, handle != null ? handle.resourceId : 0);
         mHandleDrawable.setState(TargetDrawable.STATE_INACTIVE);
+        mCenterDrawable = new TargetDrawable(res, 0);
+        mCenterDrawable.setState(TargetDrawable.STATE_INACTIVE);
         mOuterRing = new TargetDrawable(res,
                 getResourceId(a, R.styleable.GlowPadView_outerRingDrawable));
 
@@ -310,7 +327,7 @@ public class GlowPadView extends View {
         a.recycle();
 
         final ContentResolver resolver = context.getContentResolver();
-        boolean vibrateEnabled = Settings.System.getInt(resolver,Settings.System.LOCKSCREEN_VIBRATE_ENABLED, 1) == 1;
+        boolean vibrateEnabled = Settings.System.getInt(resolver, Settings.System.LOCKSCREEN_VIBRATE_ENABLED, 1) == 1;
         setVibrateEnabled(vibrateEnabled ? mVibrationDuration > 0 : false);
 
         assignDefaultsIfNeeded();
@@ -380,8 +397,7 @@ public class GlowPadView extends View {
                 + mMaxTargetHeight);
     }
 
-    private int resolveMeasured(int measureSpec, int desired)
-    {
+    private int resolveMeasured(int measureSpec, int desired) {
         int result = 0;
         int specSize = MeasureSpec.getSize(measureSpec);
         switch (MeasureSpec.getMode(measureSpec)) {
@@ -406,6 +422,9 @@ public class GlowPadView extends View {
                 startBackgroundAnimation(0, 0.0f);
                 mHandleDrawable.setState(TargetDrawable.STATE_INACTIVE);
                 mHandleDrawable.setAlpha(1.0f);
+                mCenterDrawable.setState(TargetDrawable.STATE_INACTIVE);
+                mCenterDrawable.setAlpha(1.0f);
+                mPaintText.setAlpha(255);
                 break;
 
             case STATE_START:
@@ -413,7 +432,9 @@ public class GlowPadView extends View {
                 break;
 
             case STATE_FIRST_TOUCH:
+                mPaintText.setAlpha(0);
                 mHandleDrawable.setAlpha(0.0f);
+                mCenterDrawable.setAlpha(0.0f);
                 deactivateTargets();
                 showTargets(true);
                 startBackgroundAnimation(INITIAL_SHOW_HANDLE_DURATION, 1.0f);
@@ -424,14 +445,18 @@ public class GlowPadView extends View {
                 break;
 
             case STATE_TRACKING:
+                mPaintText.setAlpha(0);
                 mHandleDrawable.setAlpha(0.0f);
-                showGlow(REVEAL_GLOW_DURATION , REVEAL_GLOW_DELAY, 1.0f, null);
+                mCenterDrawable.setAlpha(0.0f);
+                showGlow(REVEAL_GLOW_DURATION, REVEAL_GLOW_DELAY, 1.0f, null);
                 break;
 
             case STATE_SNAP:
                 // TODO: Add transition states (see list_selector_background_transition.xml)
+                mPaintText.setAlpha(0);
                 mHandleDrawable.setAlpha(0.0f);
-                showGlow(REVEAL_GLOW_DURATION , REVEAL_GLOW_DELAY, 0.0f, null);
+                mCenterDrawable.setAlpha(0.0f);
+                showGlow(REVEAL_GLOW_DURATION, REVEAL_GLOW_DELAY, 0.0f, null);
                 break;
 
             case STATE_FINISH:
@@ -441,7 +466,7 @@ public class GlowPadView extends View {
     }
 
     private void showGlow(int duration, int delay, float finalAlpha,
-            AnimatorListener finishListener) {
+                          AnimatorListener finishListener) {
         mGlowAnimations.cancel();
         mGlowAnimations.add(Tweener.to(mPointCloud.glowManager, duration,
                 "ease", Ease.Cubic.easeIn,
@@ -453,7 +478,7 @@ public class GlowPadView extends View {
     }
 
     private void hideGlow(int duration, int delay, float finalAlpha,
-            AnimatorListener finishListener) {
+                          AnimatorListener finishListener) {
         mGlowAnimations.cancel();
         mGlowAnimations.add(Tweener.to(mPointCloud.glowManager, duration,
                 "ease", Ease.Quart.easeOut,
@@ -477,6 +502,7 @@ public class GlowPadView extends View {
 
     /**
      * Dispatches a trigger event to listener. Ignored if a listener is not set.
+     *
      * @param whichTarget the target that was triggered.
      */
     private void dispatchTriggerEvent(int whichTarget) {
@@ -494,7 +520,7 @@ public class GlowPadView extends View {
 
     private void doFinish() {
         final int activeTarget = mActiveTarget;
-        final boolean targetHit =  activeTarget != -1;
+        final boolean targetHit = activeTarget != -1;
 
         if (targetHit) {
             if (DEBUG) Log.v(TAG, "Finish with target hit = " + targetHit);
@@ -752,7 +778,6 @@ public class GlowPadView extends View {
 
     /**
      * Starts wave animation.
-     *
      */
     public void ping() {
         if (mFeedbackCount > 0) {
@@ -762,7 +787,7 @@ public class GlowPadView extends View {
             // Don't do a wave if there's already one in progress
             if (waveAnimations.size() > 0 && waveAnimations.get(0).animator.isRunning()) {
                 long t = waveAnimations.get(0).animator.getCurrentPlayTime();
-                if (t < WAVE_ANIMATION_DURATION/2) {
+                if (t < WAVE_ANIMATION_DURATION / 2) {
                     doWaveAnimation = false;
                 }
             }
@@ -781,7 +806,7 @@ public class GlowPadView extends View {
     private void startWaveAnimation() {
         mWaveAnimations.cancel();
         mPointCloud.waveManager.setAlpha(1.0f);
-        mPointCloud.waveManager.setRadius(mHandleDrawable.getWidth()/2.0f);
+        mPointCloud.waveManager.setRadius(mHandleDrawable.getWidth() / 2.0f);
         mWaveAnimations.add(Tweener.to(mPointCloud.waveManager, WAVE_ANIMATION_DURATION,
                 "ease", Ease.Quad.easeOut,
                 "delay", 0,
@@ -821,7 +846,7 @@ public class GlowPadView extends View {
             }
             mBackgroundAnimator = Tweener.to(background, duration,
                     "ease", Ease.Cubic.easeIn,
-                    "alpha", (int)(255.0f * alpha),
+                    "alpha", (int) (255.0f * alpha),
                     "delay", SHOW_ANIMATION_DELAY);
             mBackgroundAnimator.animator.start();
         }
@@ -900,7 +925,7 @@ public class GlowPadView extends View {
         if (DEBUG && mDragging) Log.v(TAG, "** Handle CANCEL");
 
         // Drop the active target if canceled.
-        mActiveTarget = -1; 
+        mActiveTarget = -1;
 
         int actionIndex = event.findPointerIndex(mPointerId);
         actionIndex = actionIndex == -1 ? 0 : actionIndex;
@@ -951,11 +976,11 @@ public class GlowPadView extends View {
                     double targetMaxRad = mFirstItemOffset + (i + 0.5) * 2 * Math.PI / ntargets;
                     if (target.isEnabled()) {
                         boolean angleMatches =
-                            (angleRad > targetMinRad && angleRad <= targetMaxRad) ||
-                            (angleRad + 2 * Math.PI > targetMinRad &&
-                             angleRad + 2 * Math.PI <= targetMaxRad) ||
-                            (angleRad - 2 * Math.PI > targetMinRad &&
-                             angleRad - 2 * Math.PI <= targetMaxRad);
+                                (angleRad > targetMinRad && angleRad <= targetMaxRad) ||
+                                        (angleRad + 2 * Math.PI > targetMinRad &&
+                                                angleRad + 2 * Math.PI <= targetMaxRad) ||
+                                        (angleRad - 2 * Math.PI > targetMinRad &&
+                                                angleRad - 2 * Math.PI <= targetMaxRad);
                         if (angleMatches && (dist2(tx, ty) > snapDistance2)) {
                             activeTarget = i;
                             activeAngle = (float) -angleRad;
@@ -972,7 +997,7 @@ public class GlowPadView extends View {
         }
 
         if (activeTarget != -1) {
-            switchToState(STATE_SNAP, x,y);
+            switchToState(STATE_SNAP, x, y);
             updateGlowPosition(x, y);
         } else {
             switchToState(STATE_TRACKING, x, y);
@@ -1054,7 +1079,7 @@ public class GlowPadView extends View {
     private boolean trySwitchToFirstTouchState(float x, float y) {
         final float tx = x - mWaveCenterX;
         final float ty = y - mWaveCenterY;
-        if (mAlwaysTrackFinger || dist2(tx,ty) <= getScaledGlowRadiusSquared()) {
+        if (mAlwaysTrackFinger || dist2(tx, ty) <= getScaledGlowRadiusSquared()) {
             if (DEBUG) Log.v(TAG, "** Handle HIT");
             switchToState(STATE_FIRST_TOUCH, x, y);
             updateGlowPosition(tx, ty);
@@ -1066,7 +1091,7 @@ public class GlowPadView extends View {
 
     private void assignDefaultsIfNeeded() {
         if (mOuterRadius == 0.0f) {
-            mOuterRadius = Math.max(mOuterRing.getWidth(), mOuterRing.getHeight())/2.0f;
+            mOuterRadius = Math.max(mOuterRing.getWidth(), mOuterRing.getHeight()) / 2.0f;
         }
         if (mSnapMargin == 0.0f) {
             mSnapMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -1112,7 +1137,7 @@ public class GlowPadView extends View {
      * how much we need to scale the ring.
      */
     private float computeScaleFactor(int desiredWidth, int desiredHeight,
-            int actualWidth, int actualHeight) {
+                                     int actualWidth, int actualHeight) {
 
         // Return unity if scaling is not allowed.
         if (!mAllowScaling) return 1f;
@@ -1203,6 +1228,8 @@ public class GlowPadView extends View {
 
         mHandleDrawable.setPositionX(newWaveCenterX);
         mHandleDrawable.setPositionY(newWaveCenterY);
+        mCenterDrawable.setPositionX(newWaveCenterX);
+        mCenterDrawable.setPositionY(newWaveCenterY);
 
         updateTargetPositions(newWaveCenterX, newWaveCenterY);
         updatePointCloudPosition(newWaveCenterX, newWaveCenterY);
@@ -1270,7 +1297,41 @@ public class GlowPadView extends View {
                 target.draw(canvas);
             }
         }
+        mCenterDrawable.draw(canvas);
         mHandleDrawable.draw(canvas);
+
+        if (!TextUtils.isEmpty(mHandleText) && mPaintText.getAlpha() != 0) {
+            float x = mHandleDrawable.getPositionX();
+            float y = mHandleDrawable.getPositionY();
+            Path circle = new Path();
+            circle.addCircle(x, y, mTextRadius, Path.Direction.CW);
+            canvas.rotate(90f, x, y);
+            canvas.drawTextOnPath(mHandleText, circle, 0, 0, mPaintText);
+        }
+    }
+
+    public void setHandleDrawable(TargetDrawable d) {
+        float x = mHandleDrawable.getPositionX();
+        float y = mHandleDrawable.getPositionY();
+        mHandleDrawable = new TargetDrawable(d);
+        mHandleDrawable.setPositionX(x);
+        mHandleDrawable.setPositionY(y);
+    }
+
+    public void setHandleText(String text) {
+        mHandleText = TextUtils.ellipsize(
+                text, new TextPaint(mPaintText), mMaxTextArcLength,
+                TextUtils.TruncateAt.END).toString();
+    }
+
+    public void setCenterDrawable(TargetDrawable d) {
+        mCenterDrawable = new TargetDrawable(d);
+        mCenterDrawable.setPositionX(mWaveCenterX);
+        mCenterDrawable.setPositionY(mWaveCenterY);
+    }
+
+    public void setDrawOuterRing(boolean drawOuterRing) {
+        mDrawOuterRing = drawOuterRing;
     }
 
     public void setOnTriggerListener(OnTriggerListener listener) {
@@ -1282,7 +1343,7 @@ public class GlowPadView extends View {
     }
 
     private float dist2(float dx, float dy) {
-        return dx*dx + dy*dy;
+        return dx * dx + dy * dy;
     }
 
     private float getScaledGlowRadiusSquared() {
@@ -1365,6 +1426,7 @@ public class GlowPadView extends View {
 
     /**
      * Gets the position of a target in the array that matches the given resource.
+     *
      * @param resourceId
      * @return the index or -1 if not found
      */
@@ -1379,7 +1441,7 @@ public class GlowPadView extends View {
     }
 
     private boolean replaceTargetDrawables(Resources res, int existingResourceId,
-            int newResourceId) {
+                                           int newResourceId) {
         if (existingResourceId == 0 || newResourceId == 0) {
             return false;
         }
@@ -1405,13 +1467,14 @@ public class GlowPadView extends View {
     /**
      * Searches the given package for a resource to use to replace the Drawable on the
      * target with the given resource id
-     * @param component of the .apk that contains the resource
-     * @param name of the metadata in the .apk
+     *
+     * @param component     of the .apk that contains the resource
+     * @param name          of the metadata in the .apk
      * @param existingResId the resource id of the target to search for
      * @return true if found in the given package and replaced at least one target Drawables
      */
     public boolean replaceTargetDrawablesIfPresent(ComponentName component, String name,
-                int existingResId) {
+                                                   int existingResId) {
         if (existingResId == 0) return false;
 
         boolean replaced = false;

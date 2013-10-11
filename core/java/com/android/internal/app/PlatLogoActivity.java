@@ -74,7 +74,7 @@ public class PlatLogoActivity extends Activity {
         tv.setTextSize(1.25f*size);
         tv.setTextColor(0xFFFFFFFF);
         tv.setShadowLayer(4*metrics.density, 0, 2*metrics.density, 0x66000000);
-        tv.setText(mIsCid ? "CyanogenMod " + cmVersion : "Android " + Build.VERSION.RELEASE);
+        tv.setText(mIsCid ? "Velox - Nameless" : "Android " + Build.VERSION.RELEASE);
         view.addView(tv, lp);
 
         tv = new TextView(this);
@@ -82,7 +82,7 @@ public class PlatLogoActivity extends Activity {
         tv.setTextSize(size);
         tv.setTextColor(0xFFFFFFFF);
         tv.setShadowLayer(4*metrics.density, 0, 2*metrics.density, 0x66000000);
-        tv.setText(mIsCid ? "Android " + Build.VERSION.RELEASE : "JELLY BEAN");
+        tv.setText(mIsCid ? cmVersion : "JELLY BEAN");
         view.addView(tv, lp);
 
         return view;

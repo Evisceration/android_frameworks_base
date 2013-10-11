@@ -32,7 +32,7 @@ public class HaloTile extends QuickSettingsTile {
             }
         };
 
-        qsc.registerObservedContent(Settings.Secure.getUriFor(Settings.System.HALO_ACTIVE), this);
+        qsc.registerObservedContent(Settings.System.getUriFor(Settings.System.HALO_ACTIVE), this);
         updateResources();
     }
 

@@ -30,6 +30,10 @@
     <string name="halo_signal_bars_1">ONE BAR</string>
     <string name="halo_signal_bars_none">NO BARS</string>
 
+    <!-- Halo QuickTile -->
+    <string name="quick_settings_halo_enabled_label">Halo Enabled</string>
+    <string name="quick_settings_halo_disabled_label">Halo Disabled</string>
+
     <!-- Title shown in recents popup for showing app in floating mode -->
     <string name="status_bar_recent_floating_item_title">Floating mode</string>
 

@@ -678,6 +678,20 @@ public final class Settings {
     public static final String ACTION_NOTIFICATION_LISTENER_SETTINGS
             = "android.settings.NOTIFICATION_LISTENER_SETTINGS";
 
+    /**
+     * Activity Action: Show settings for custom modules.
+     * <p/>
+     * In some cases, a matching Activity may not exist, so ensure you
+     * safeguard against this.
+     * <p/>
+     * Input: Nothing.
+     * <p/>
+     * Output: Nothing.
+     */
+    @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
+    public static final String ACTION_CUSTOM_SETTINGS =
+            "android.settings.CUSTOM_SETTINGS";
+
     // End of Intent actions for Settings
 
     /**

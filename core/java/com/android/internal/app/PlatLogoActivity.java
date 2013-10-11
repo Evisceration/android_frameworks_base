@@ -64,10 +64,12 @@ public class PlatLogoActivity extends Activity {
         lp.gravity = Gravity.CENTER_HORIZONTAL;
         lp.bottomMargin = (int) (-4*metrics.density);
 
-        String cmVersion = SystemProperties.get("ro.cm.version");
+        String cmVersion = SystemProperties.get("ro.modversion");
         if (cmVersion != null) {
-            cmVersion = cmVersion.replaceAll("([0-9\\.]+?)-.*", "$1");
+            cmVersion = cmVersion.split("-")[cmVersion.split("-").length - 1];
         }
+
+        cmVersion = "Version " + cmVersion;
 
         TextView tv = new TextView(this);
         if (light != null) tv.setTypeface(light);

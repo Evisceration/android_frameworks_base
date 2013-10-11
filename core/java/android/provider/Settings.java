@@ -2752,6 +2752,13 @@ public final class Settings {
         public static final String ACTIVE_DISPLAY_BRIGHTNESS = "active_display_brightness";
 
         /**
+         * Timeout of the display when there is no user interaction
+         *
+         * @hide
+         */
+        public static final String ACTIVE_DISPLAY_TIMEOUT = "active_display_timeout";
+
+        /**
          * Display active display view when device comes out of the user's pocket, etc...
          *
          * @hide

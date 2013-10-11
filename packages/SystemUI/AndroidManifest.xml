@@ -3,6 +3,10 @@
         package="com.android.systemui"
         coreApp="true">
 
+    <uses-sdk
+        android:minSdkVersion="18"
+        android:targetSdkVersion="18" />
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -274,7 +278,8 @@
             android:theme="@style/Theme.DummyActivity"></activity>
 
         <!-- Halo -->
-        <activity android:name="com.android.systemui.Transparent"
+        <activity
+            android:name="com.android.systemui.Transparent"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
     </application>

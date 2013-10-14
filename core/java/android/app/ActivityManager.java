@@ -384,8 +384,8 @@ public class ActivityManager {
      */
     static public boolean isHighEndGfx() {
 
-        if(SystemProperties.get(Settings.System.USE_HIGHEND_GFX).equals("1")){
-            return true;
+        if(SystemProperties.get(Settings.System.USE_HIGHEND_GFX).equals("0")){
+            return false;
         }
 
         MemInfoReader reader = new MemInfoReader();
@@ -406,6 +406,11 @@ public class ActivityManager {
             // pixels on it that we'd really like to use hw drawing.
             return true;
         }
+
+        if(SystemProperties.get(Settings.System.USE_HIGHEND_GFX).equals("1")){
+            return true;
+        }
+
         return false;
     }
 

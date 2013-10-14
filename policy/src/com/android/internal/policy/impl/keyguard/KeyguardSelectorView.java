@@ -15,10 +15,6 @@
  */
 package com.android.internal.policy.impl.keyguard;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-
 import android.animation.ObjectAnimator;
 import android.app.SearchManager;
 import android.app.admin.DevicePolicyManager;
@@ -26,9 +22,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
 import android.os.UserHandle;
@@ -40,19 +35,22 @@ import android.util.Slog;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.android.internal.R;
 import com.android.internal.telephony.IccCardConstants.State;
 import com.android.internal.util.cm.LockscreenTargetUtils;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.widget.multiwaveview.GlowPadView;
 import com.android.internal.widget.multiwaveview.GlowPadView.OnTriggerListener;
-import com.android.internal.R;
 import com.android.internal.widget.multiwaveview.TargetDrawable;
+
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 public class KeyguardSelectorView extends LinearLayout implements KeyguardSecurityView {
     private static final boolean DEBUG = KeyguardHostView.DEBUG;
     private static final String TAG = "SecuritySelectorView";
     private static final String ASSIST_ICON_METADATA_NAME =
-        "com.android.systemui.action_assist_icon";
+            "com.android.systemui.action_assist_icon";
 
     private KeyguardSecurityCallback mCallback;
     private GlowPadView mGlowPadView;
@@ -67,6 +65,7 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
     private String[] mStoredTargets;
     private int mTargetOffset;
     private boolean mIsScreenLarge;
+    private float mBatteryLevel;
 
     OnTriggerListener mOnTriggerListener = new OnTriggerListener() {
 
@@ -74,28 +73,28 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
             if (mStoredTargets == null) {
                 final int resId = mGlowPadView.getResourceIdForTarget(target);
                 switch (resId) {
-                case com.android.internal.R.drawable.ic_action_assist_generic:
-                    Intent assistIntent =
-                    ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
-                    .getAssistIntent(mContext, true, UserHandle.USER_CURRENT);
-                    if (assistIntent != null) {
-                        mActivityLauncher.launchActivity(assistIntent, false, true, null, null);
-                    } else {
-                        Log.w(TAG, "Failed to get intent for assist activity");
-                    }
-                    mCallback.userActivity(0);
-                    break;
+                    case com.android.internal.R.drawable.ic_action_assist_generic:
+                        Intent assistIntent =
+                                ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
+                                        .getAssistIntent(mContext, true, UserHandle.USER_CURRENT);
+                        if (assistIntent != null) {
+                            mActivityLauncher.launchActivity(assistIntent, false, true, null, null);
+                        } else {
+                            Log.w(TAG, "Failed to get intent for assist activity");
+                        }
+                        mCallback.userActivity(0);
+                        break;
 
-                case com.android.internal.R.drawable.ic_lockscreen_camera:
-                    mActivityLauncher.launchCamera(null, null);
-                    mCallback.userActivity(0);
-                    break;
+                    case com.android.internal.R.drawable.ic_lockscreen_camera:
+                        mActivityLauncher.launchCamera(null, null);
+                        mCallback.userActivity(0);
+                        break;
 
-                case com.android.internal.R.drawable.ic_lockscreen_unlock_phantom:
-                case com.android.internal.R.drawable.ic_lockscreen_unlock:
-                    mCallback.userActivity(0);
-                    mCallback.dismiss(false);
-                    break;
+                    case com.android.internal.R.drawable.ic_lockscreen_unlock_phantom:
+                    case com.android.internal.R.drawable.ic_lockscreen_unlock:
+                        mCallback.userActivity(0);
+                        mCallback.dismiss(false);
+                        break;
                 }
             } else {
                 if (target == mTargetOffset) {
@@ -151,6 +150,12 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
         public void onSimStateChanged(State simState) {
             updateTargets();
         }
+
+        @Override
+        public void onRefreshBatteryInfo(KeyguardUpdateMonitor.BatteryStatus batStatus) {
+            updateLockscreenBattery(batStatus);
+        }
+
     };
 
     private final KeyguardActivityLauncher mActivityLauncher = new KeyguardActivityLauncher() {
@@ -238,12 +243,13 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
                 currentUserHandle);
         boolean searchActionAvailable =
                 ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
-                .getAssistIntent(mContext, false, UserHandle.USER_CURRENT) != null;
+                        .getAssistIntent(mContext, false, UserHandle.USER_CURRENT) != null;
         mCameraDisabled = cameraDisabledByAdmin || disabledBySimState || !cameraPresent
                 || !currentUserSetup;
         mSearchDisabled = disabledBySimState || !searchActionAvailable || !searchTargetPresent
                 || !currentUserSetup;
         updateResources();
+        updateLockscreenBattery(null);
     }
 
     public void updateResources() {
@@ -264,9 +270,9 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
                             com.android.internal.R.drawable.ic_action_assist_generic);
 
                     if (!replaced && !mGlowPadView.replaceTargetDrawablesIfPresent(component,
-                                ASSIST_ICON_METADATA_NAME,
-                                com.android.internal.R.drawable.ic_action_assist_generic)) {
-                            Slog.w(TAG, "Couldn't grab icon from package " + component);
+                            ASSIST_ICON_METADATA_NAME,
+                            com.android.internal.R.drawable.ic_action_assist_generic)) {
+                        Slog.w(TAG, "Couldn't grab icon from package " + component);
                     }
                 }
             }
@@ -350,7 +356,7 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
 
                     int inset = LockscreenTargetUtils.getInsetForIconType(mContext, type);
                     Drawable drawable = LockscreenTargetUtils.getLayeredDrawable(mContext,
-                            back,front, inset, frontBlank);
+                            back, front, inset, frontBlank);
                     TargetDrawable targetDrawable = new TargetDrawable(res, drawable);
 
                     ComponentName compName = intent.getComponent();
@@ -425,5 +431,27 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
         mIsBouncing = false;
         KeyguardSecurityViewHelper.
                 hideBouncer(mSecurityMessageDisplay, mFadeView, mBouncerFrame, duration);
+    }
+
+    public void updateLockscreenBattery(KeyguardUpdateMonitor.BatteryStatus status) {
+        if (Settings.System.getIntForUser(
+                mContext.getContentResolver(),
+                Settings.System.BATTERY_AROUND_LOCKSCREEN_RING,
+                0 /*default */,
+                UserHandle.USER_CURRENT) == 1) {
+            if (status != null) mBatteryLevel = status.level;
+            float cappedBattery = mBatteryLevel;
+
+            if (mBatteryLevel < 15) {
+                cappedBattery = 15;
+            } else if (mBatteryLevel > 90) {
+                cappedBattery = 90;
+            }
+
+            final float hue = (cappedBattery - 15) * 1.6f;
+            mGlowPadView.setArc(mBatteryLevel * 3.6f, Color.HSVToColor(0x80, new float[]{hue, 1.f, 1.f}));
+        } else {
+            mGlowPadView.setArc(0, 0);
+        }
     }
 }

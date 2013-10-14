@@ -2667,6 +2667,13 @@ public final class Settings {
         public static final String LOCKSCREEN_TARGETS = "lockscreen_targets";
 
         /**
+         * Whether or not to show circle battery around the lockscreen ring
+         *
+         * @hide
+         */
+        public static final String BATTERY_AROUND_LOCKSCREEN_RING = "battery_around_lockscreen_ring";
+
+        /**
          * HALO, should default to 0 (no, do not show)
          *
          * @hide

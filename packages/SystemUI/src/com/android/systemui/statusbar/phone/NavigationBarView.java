@@ -31,6 +31,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.UserHandle;
 import android.util.AttributeSet;
@@ -41,7 +42,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Surface;
 import android.view.ViewGroup;
+import android.view.IWindowManager;
 import android.view.WindowManager;
+import android.view.WindowManagerGlobal;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 

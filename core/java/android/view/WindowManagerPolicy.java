@@ -1125,6 +1125,12 @@ public interface WindowManagerPolicy {
     public boolean hasNavigationBar();
 
     /**
+     * Specifies whether the on-screen navigation bar and the status bar are translucent
+     */
+    public boolean isBarTranslucent();
+    public void setBarTranslucentAllowed(boolean allowed);
+
+    /**
      * Specifies whether device can generate KEY_ACTION_MENU keypress
      */
     public boolean hasMenuKeyEnabled();

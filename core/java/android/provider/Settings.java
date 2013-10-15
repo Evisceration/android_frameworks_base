@@ -3299,6 +3299,13 @@ public final class Settings {
         public static final String HEADSET_CONNECT_PLAYER = "headset_connect_player";
 
         /**
+         * Whether or not to make the statusbar translucent on the keyguard
+         *
+         * @hide
+         */
+        public static final String STATUS_BAR_TRANSPARENT_ON_KEYGUARD = "status_bar_transparent_on_keyguard";
+
+        /**
          * Whether national data roaming should be used.
          *
          * @hide

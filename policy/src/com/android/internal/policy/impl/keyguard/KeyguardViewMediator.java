@@ -52,7 +52,9 @@ import android.telephony.TelephonyManager;
 import android.util.EventLog;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.IWindowManager;
 import android.view.WindowManager;
+import android.view.WindowManagerGlobal;
 import android.view.WindowManagerPolicy;
 
 import com.android.internal.telephony.IccCardConstants;
@@ -1375,6 +1377,7 @@ public class KeyguardViewMediator {
 
             // Disable aspects of the system/status/navigation bars that must not be re-enabled by
             // windows that appear on top, ever
+            final IWindowManager wm = WindowManagerGlobal.getInstance().getWindowManagerService();
             int flags = StatusBarManager.DISABLE_NONE;
             if (mShowing) {
                 // Permanently disable components not available when keyguard is enabled
@@ -1391,6 +1394,20 @@ public class KeyguardViewMediator {
                 }
                 if (!isAssistantAvailable()) {
                     flags |= StatusBarManager.DISABLE_SEARCH;
+                }
+
+                try {
+                    // Notify that the status bar can be translucent
+                    wm.setBarTranslucentAllowed(true);
+                } catch (RemoteException e) {
+                    // Do nothing
+                }
+            } else {
+                try {
+                    // Notify that the status bar can be translucent
+                    wm.setBarTranslucentAllowed(false);
+                } catch (RemoteException e) {
+                    // Do nothing
                 }
             }
 

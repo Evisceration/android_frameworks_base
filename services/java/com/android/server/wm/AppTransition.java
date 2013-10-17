@@ -16,12 +16,15 @@
 
 package com.android.server.wm;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.IRemoteCallback;
+import android.provider.Settings;
 import android.util.Slog;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -32,31 +35,32 @@ import android.view.animation.Interpolator;
 import android.view.animation.ScaleAnimation;
 
 import com.android.internal.util.DumpUtils.Dump;
+import com.android.internal.util.velox.AwesomeAnimationHelper;
 import com.android.server.AttributeCache;
 import com.android.server.wm.WindowManagerService.H;
 
 import java.io.PrintWriter;
 
-import static com.android.internal.R.styleable.WindowAnimation_activityOpenEnterAnimation;
-import static com.android.internal.R.styleable.WindowAnimation_activityOpenExitAnimation;
 import static com.android.internal.R.styleable.WindowAnimation_activityCloseEnterAnimation;
 import static com.android.internal.R.styleable.WindowAnimation_activityCloseExitAnimation;
-import static com.android.internal.R.styleable.WindowAnimation_taskOpenEnterAnimation;
-import static com.android.internal.R.styleable.WindowAnimation_taskOpenExitAnimation;
+import static com.android.internal.R.styleable.WindowAnimation_activityOpenEnterAnimation;
+import static com.android.internal.R.styleable.WindowAnimation_activityOpenExitAnimation;
 import static com.android.internal.R.styleable.WindowAnimation_taskCloseEnterAnimation;
 import static com.android.internal.R.styleable.WindowAnimation_taskCloseExitAnimation;
-import static com.android.internal.R.styleable.WindowAnimation_taskToFrontEnterAnimation;
-import static com.android.internal.R.styleable.WindowAnimation_taskToFrontExitAnimation;
+import static com.android.internal.R.styleable.WindowAnimation_taskOpenEnterAnimation;
+import static com.android.internal.R.styleable.WindowAnimation_taskOpenExitAnimation;
 import static com.android.internal.R.styleable.WindowAnimation_taskToBackEnterAnimation;
 import static com.android.internal.R.styleable.WindowAnimation_taskToBackExitAnimation;
-import static com.android.internal.R.styleable.WindowAnimation_wallpaperOpenEnterAnimation;
-import static com.android.internal.R.styleable.WindowAnimation_wallpaperOpenExitAnimation;
+import static com.android.internal.R.styleable.WindowAnimation_taskToFrontEnterAnimation;
+import static com.android.internal.R.styleable.WindowAnimation_taskToFrontExitAnimation;
 import static com.android.internal.R.styleable.WindowAnimation_wallpaperCloseEnterAnimation;
 import static com.android.internal.R.styleable.WindowAnimation_wallpaperCloseExitAnimation;
-import static com.android.internal.R.styleable.WindowAnimation_wallpaperIntraOpenEnterAnimation;
-import static com.android.internal.R.styleable.WindowAnimation_wallpaperIntraOpenExitAnimation;
 import static com.android.internal.R.styleable.WindowAnimation_wallpaperIntraCloseEnterAnimation;
 import static com.android.internal.R.styleable.WindowAnimation_wallpaperIntraCloseExitAnimation;
+import static com.android.internal.R.styleable.WindowAnimation_wallpaperIntraOpenEnterAnimation;
+import static com.android.internal.R.styleable.WindowAnimation_wallpaperIntraOpenExitAnimation;
+import static com.android.internal.R.styleable.WindowAnimation_wallpaperOpenEnterAnimation;
+import static com.android.internal.R.styleable.WindowAnimation_wallpaperOpenExitAnimation;
 
 // State management of app transitions.  When we are preparing for a
 // transition, mNextAppTransition will be the kind of transition to
@@ -69,46 +73,76 @@ public class AppTransition implements Dump {
             WindowManagerService.DEBUG_APP_TRANSITIONS;
     private static final boolean DEBUG_ANIM = WindowManagerService.DEBUG_ANIM;
 
-    /** Bit mask that is set for all enter transition. */
+    /**
+     * Bit mask that is set for all enter transition.
+     */
     public static final int TRANSIT_ENTER_MASK = 0x1000;
 
-    /** Bit mask that is set for all exit transitions. */
+    /**
+     * Bit mask that is set for all exit transitions.
+     */
     public static final int TRANSIT_EXIT_MASK = 0x2000;
 
-    /** Not set up for a transition. */
+    /**
+     * Not set up for a transition.
+     */
     public static final int TRANSIT_UNSET = -1;
-    /** No animation for transition. */
+    /**
+     * No animation for transition.
+     */
     public static final int TRANSIT_NONE = 0;
-    /** A window in a new activity is being opened on top of an existing one in the same task. */
+    /**
+     * A window in a new activity is being opened on top of an existing one in the same task.
+     */
     public static final int TRANSIT_ACTIVITY_OPEN = 6 | TRANSIT_ENTER_MASK;
-    /** The window in the top-most activity is being closed to reveal the
-     * previous activity in the same task. */
+    /**
+     * The window in the top-most activity is being closed to reveal the
+     * previous activity in the same task.
+     */
     public static final int TRANSIT_ACTIVITY_CLOSE = 7 | TRANSIT_EXIT_MASK;
-    /** A window in a new task is being opened on top of an existing one
-     * in another activity's task. */
+    /**
+     * A window in a new task is being opened on top of an existing one
+     * in another activity's task.
+     */
     public static final int TRANSIT_TASK_OPEN = 8 | TRANSIT_ENTER_MASK;
-    /** A window in the top-most activity is being closed to reveal the
-     * previous activity in a different task. */
+    /**
+     * A window in the top-most activity is being closed to reveal the
+     * previous activity in a different task.
+     */
     public static final int TRANSIT_TASK_CLOSE = 9 | TRANSIT_EXIT_MASK;
-    /** A window in an existing task is being displayed on top of an existing one
-     * in another activity's task. */
+    /**
+     * A window in an existing task is being displayed on top of an existing one
+     * in another activity's task.
+     */
     public static final int TRANSIT_TASK_TO_FRONT = 10 | TRANSIT_ENTER_MASK;
-    /** A window in an existing task is being put below all other tasks. */
+    /**
+     * A window in an existing task is being put below all other tasks.
+     */
     public static final int TRANSIT_TASK_TO_BACK = 11 | TRANSIT_EXIT_MASK;
-    /** A window in a new activity that doesn't have a wallpaper is being opened on top of one that
-     * does, effectively closing the wallpaper. */
+    /**
+     * A window in a new activity that doesn't have a wallpaper is being opened on top of one that
+     * does, effectively closing the wallpaper.
+     */
     public static final int TRANSIT_WALLPAPER_CLOSE = 12 | TRANSIT_EXIT_MASK;
-    /** A window in a new activity that does have a wallpaper is being opened on one that didn't,
-     * effectively opening the wallpaper. */
+    /**
+     * A window in a new activity that does have a wallpaper is being opened on one that didn't,
+     * effectively opening the wallpaper.
+     */
     public static final int TRANSIT_WALLPAPER_OPEN = 13 | TRANSIT_ENTER_MASK;
-    /** A window in a new activity is being opened on top of an existing one, and both are on top
-     * of the wallpaper. */
+    /**
+     * A window in a new activity is being opened on top of an existing one, and both are on top
+     * of the wallpaper.
+     */
     public static final int TRANSIT_WALLPAPER_INTRA_OPEN = 14 | TRANSIT_ENTER_MASK;
-    /** The window in the top-most activity is being closed to reveal the previous activity, and
-     * both are on top of the wallpaper. */
+    /**
+     * The window in the top-most activity is being closed to reveal the previous activity, and
+     * both are on top of the wallpaper.
+     */
     public static final int TRANSIT_WALLPAPER_INTRA_CLOSE = 15 | TRANSIT_EXIT_MASK;
 
-    /** Fraction of animation at which the recents thumbnail becomes completely transparent */
+    /**
+     * Fraction of animation at which the recents thumbnail becomes completely transparent
+     */
     private static final float RECENTS_THUMBNAIL_FADEOUT_FRACTION = 0.25f;
 
     private static final long DEFAULT_APP_TRANSITION_DURATION = 250;
@@ -147,10 +181,19 @@ public class AppTransition implements Dump {
     private final Interpolator mDecelerateInterpolator;
     private final Interpolator mThumbnailFadeoutInterpolator;
 
+    private SettingsObserver mSettingsObserver;
+    private int[] mActivityAnimations = new int[10];
+    private int mAnimationDuration;
+    private boolean mIsResId = false;
+    private boolean mNoOverrides;
+
     private int mCurrentUserId = 0;
 
     AppTransition(Context context, Handler h) {
         mContext = context;
+        mSettingsObserver = new SettingsObserver(h);
+        mSettingsObserver.observe();
+        updateSettings();
         mH = h;
         mConfigShortAnimTime = context.getResources().getInteger(
                 com.android.internal.R.integer.config_shortAnimTime);
@@ -182,7 +225,7 @@ public class AppTransition implements Dump {
 
     int getAppTransition() {
         return mNextAppTransition;
-     }
+    }
 
     void setAppTransition(int transit) {
         mNextAppTransition = transit;
@@ -255,7 +298,7 @@ public class AppTransition implements Dump {
             // resources if we can.
             String packageName = lp.packageName != null ? lp.packageName : "android";
             int resId = lp.windowAnimations;
-            if ((resId&0xFF000000) == 0x01000000) {
+            if ((resId & 0xFF000000) == 0x01000000) {
                 packageName = "android";
             }
             if (DEBUG_ANIM) Slog.v(TAG, "Loading animations: picked package="
@@ -270,7 +313,7 @@ public class AppTransition implements Dump {
         if (DEBUG_ANIM) Slog.v(TAG, "Loading animations: package="
                 + packageName + " resId=0x" + Integer.toHexString(resId));
         if (packageName != null) {
-            if ((resId&0xFF000000) == 0x01000000) {
+            if ((resId & 0xFF000000) == 0x01000000) {
                 packageName = "android";
             }
             if (DEBUG_ANIM) Slog.v(TAG, "Loading animations: picked package="
@@ -285,10 +328,14 @@ public class AppTransition implements Dump {
         int anim = 0;
         Context context = mContext;
         if (animAttr >= 0) {
-            AttributeCache.Entry ent = getCachedAnimations(lp);
-            if (ent != null) {
-                context = ent.context;
-                anim = ent.array.getResourceId(animAttr, 0);
+            if (mIsResId) {
+                anim = animAttr;
+            } else {
+                AttributeCache.Entry ent = getCachedAnimations(lp);
+                if (ent != null) {
+                    context = ent.context;
+                    anim = ent.array.getResourceId(animAttr, 0);
+                }
             }
         }
         if (anim != 0) {
@@ -318,13 +365,14 @@ public class AppTransition implements Dump {
      * rect on screen to a larger rect.  The pivot point varies depending on
      * the distance between the inner and outer edges on both sides.  This
      * function computes the pivot point for one dimension.
-     * @param startPos  Offset from left/top edge of outer rectangle to
-     * left/top edge of inner rectangle.
+     *
+     * @param startPos   Offset from left/top edge of outer rectangle to
+     *                   left/top edge of inner rectangle.
      * @param finalScale The scaling factor between the size of the outer
-     * and inner rectangles.
+     *                   and inner rectangles.
      */
     private static float computePivot(int startPos, float finalScale) {
-        final float denom = finalScale-1;
+        final float denom = finalScale - 1;
         if (Math.abs(denom) < .0001f) {
             return startPos;
         }
@@ -351,8 +399,8 @@ public class AppTransition implements Dump {
             set.addAnimation(alpha);
             set.setDetachWallpaper(true);
             a = set;
-        } else  if (transit == TRANSIT_WALLPAPER_INTRA_OPEN ||
-                    transit == TRANSIT_WALLPAPER_INTRA_CLOSE) {
+        } else if (transit == TRANSIT_WALLPAPER_INTRA_OPEN ||
+                transit == TRANSIT_WALLPAPER_INTRA_CLOSE) {
             // If we are on top of the wallpaper, we need an animation that
             // correctly handles the wallpaper staying static behind all of
             // the animated elements.  To do this, will just have the existing
@@ -385,7 +433,7 @@ public class AppTransition implements Dump {
     }
 
     Animation createThumbnailAnimationLocked(int transit, boolean enter, boolean thumb,
-                                    int appWidth, int appHeight) {
+                                             int appWidth, int appHeight) {
         Animation a;
         final int thumbWidthI = mNextAppTransitionThumbnail.getWidth();
         final float thumbWidth = thumbWidthI > 0 ? thumbWidthI : 1;
@@ -481,22 +529,23 @@ public class AppTransition implements Dump {
 
     Animation loadAnimation(WindowManager.LayoutParams lp, int transit, boolean enter,
                             int appWidth, int appHeight) {
+        mIsResId = false;
         Animation a;
         if (mNextAppTransitionType == NEXT_TRANSIT_TYPE_CUSTOM) {
             a = loadAnimation(mNextAppTransitionPackage, enter ?
                     mNextAppTransitionEnter : mNextAppTransitionExit);
             if (DEBUG_APP_TRANSITIONS || DEBUG_ANIM) Slog.v(TAG,
                     "applyAnimation:"
-                    + " anim=" + a + " nextAppTransition=ANIM_CUSTOM"
-                    + " transit=" + transit + " isEntrance=" + enter
-                    + " Callers=" + Debug.getCallers(3));
+                            + " anim=" + a + " nextAppTransition=ANIM_CUSTOM"
+                            + " transit=" + transit + " isEntrance=" + enter
+                            + " Callers=" + Debug.getCallers(3));
         } else if (mNextAppTransitionType == NEXT_TRANSIT_TYPE_SCALE_UP) {
             a = createScaleUpAnimationLocked(transit, enter, appWidth, appHeight);
             if (DEBUG_APP_TRANSITIONS || DEBUG_ANIM) Slog.v(TAG,
                     "applyAnimation:"
-                    + " anim=" + a + " nextAppTransition=ANIM_SCALE_UP"
-                    + " transit=" + transit + " isEntrance=" + enter
-                    + " Callers=" + Debug.getCallers(3));
+                            + " anim=" + a + " nextAppTransition=ANIM_SCALE_UP"
+                            + " transit=" + transit + " isEntrance=" + enter
+                            + " Callers=" + Debug.getCallers(3));
         } else if (mNextAppTransitionType == NEXT_TRANSIT_TYPE_THUMBNAIL_SCALE_UP ||
                 mNextAppTransitionType == NEXT_TRANSIT_TYPE_THUMBNAIL_SCALE_DOWN) {
             mNextAppTransitionScaleUp =
@@ -514,63 +563,149 @@ public class AppTransition implements Dump {
             int animAttr = 0;
             switch (transit) {
                 case TRANSIT_ACTIVITY_OPEN:
-                    animAttr = enter
-                            ? WindowAnimation_activityOpenEnterAnimation
-                            : WindowAnimation_activityOpenExitAnimation;
+                    if (mActivityAnimations[0] != 0) {
+                        mIsResId = true;
+                        int[] animArray = AwesomeAnimationHelper.getAnimations(mActivityAnimations[0]);
+                        animAttr = enter
+                                ? animArray[1]
+                                : animArray[0];
+                    } else {
+                        animAttr = enter
+                                ? WindowAnimation_activityOpenEnterAnimation
+                                : WindowAnimation_activityOpenExitAnimation;
+                    }
                     break;
                 case TRANSIT_ACTIVITY_CLOSE:
-                    animAttr = enter
-                            ? WindowAnimation_activityCloseEnterAnimation
-                            : WindowAnimation_activityCloseExitAnimation;
+                    if (mActivityAnimations[1] != 0) {
+                        mIsResId = true;
+                        int[] animArray = AwesomeAnimationHelper.getAnimations(mActivityAnimations[1]);
+                        animAttr = enter
+                                ? animArray[1]
+                                : animArray[0];
+                    } else {
+                        animAttr = enter
+                                ? WindowAnimation_activityCloseEnterAnimation
+                                : WindowAnimation_activityCloseExitAnimation;
+                    }
                     break;
                 case TRANSIT_TASK_OPEN:
-                    animAttr = enter
-                            ? WindowAnimation_taskOpenEnterAnimation
-                            : WindowAnimation_taskOpenExitAnimation;
+                    if (mActivityAnimations[2] != 0) {
+                        mIsResId = true;
+                        int[] animArray = AwesomeAnimationHelper.getAnimations(mActivityAnimations[2]);
+                        animAttr = enter
+                                ? animArray[1]
+                                : animArray[0];
+                    } else {
+                        animAttr = enter
+                                ? WindowAnimation_taskOpenEnterAnimation
+                                : WindowAnimation_taskOpenExitAnimation;
+                    }
                     break;
                 case TRANSIT_TASK_CLOSE:
-                    animAttr = enter
-                            ? WindowAnimation_taskCloseEnterAnimation
-                            : WindowAnimation_taskCloseExitAnimation;
+                    if (mActivityAnimations[3] != 0) {
+                        mIsResId = true;
+                        int[] animArray = AwesomeAnimationHelper.getAnimations(mActivityAnimations[3]);
+                        animAttr = enter
+                                ? animArray[1]
+                                : animArray[0];
+                    } else {
+                        animAttr = enter
+                                ? WindowAnimation_taskCloseEnterAnimation
+                                : WindowAnimation_taskCloseExitAnimation;
+                    }
                     break;
                 case TRANSIT_TASK_TO_FRONT:
-                    animAttr = enter
-                            ? WindowAnimation_taskToFrontEnterAnimation
-                            : WindowAnimation_taskToFrontExitAnimation;
+                    if (mActivityAnimations[4] != 0) {
+                        mIsResId = true;
+                        int[] animArray = AwesomeAnimationHelper.getAnimations(mActivityAnimations[4]);
+                        animAttr = enter
+                                ? animArray[1]
+                                : animArray[0];
+                    } else {
+                        animAttr = enter
+                                ? WindowAnimation_taskToFrontEnterAnimation
+                                : WindowAnimation_taskToFrontExitAnimation;
+                    }
                     break;
                 case TRANSIT_TASK_TO_BACK:
-                    animAttr = enter
-                            ? WindowAnimation_taskToBackEnterAnimation
-                            : WindowAnimation_taskToBackExitAnimation;
+                    if (mActivityAnimations[5] != 0) {
+                        mIsResId = true;
+                        int[] animArray = AwesomeAnimationHelper.getAnimations(mActivityAnimations[5]);
+                        animAttr = enter
+                                ? animArray[1]
+                                : animArray[0];
+                    } else {
+                        animAttr = enter
+                                ? WindowAnimation_taskToBackEnterAnimation
+                                : WindowAnimation_taskToBackExitAnimation;
+                    }
                     break;
                 case TRANSIT_WALLPAPER_OPEN:
-                    animAttr = enter
-                            ? WindowAnimation_wallpaperOpenEnterAnimation
-                            : WindowAnimation_wallpaperOpenExitAnimation;
+                    if (mActivityAnimations[6] != 0) {
+                        mIsResId = true;
+                        int[] animArray = AwesomeAnimationHelper.getAnimations(mActivityAnimations[6]);
+                        animAttr = enter
+                                ? animArray[1]
+                                : animArray[0];
+                    } else {
+                        animAttr = enter
+                                ? WindowAnimation_wallpaperOpenEnterAnimation
+                                : WindowAnimation_wallpaperOpenExitAnimation;
+                    }
                     break;
                 case TRANSIT_WALLPAPER_CLOSE:
-                    animAttr = enter
-                            ? WindowAnimation_wallpaperCloseEnterAnimation
-                            : WindowAnimation_wallpaperCloseExitAnimation;
+                    if (mActivityAnimations[7] != 0) {
+                        mIsResId = true;
+                        int[] animArray = AwesomeAnimationHelper.getAnimations(mActivityAnimations[7]);
+                        animAttr = enter
+                                ? animArray[1]
+                                : animArray[0];
+                    } else {
+                        animAttr = enter
+                                ? WindowAnimation_wallpaperCloseEnterAnimation
+                                : WindowAnimation_wallpaperCloseExitAnimation;
+                    }
                     break;
                 case TRANSIT_WALLPAPER_INTRA_OPEN:
-                    animAttr = enter
-                            ? WindowAnimation_wallpaperIntraOpenEnterAnimation
-                            : WindowAnimation_wallpaperIntraOpenExitAnimation;
+                    if (mActivityAnimations[8] != 0) {
+                        mIsResId = true;
+                        int[] animArray = AwesomeAnimationHelper.getAnimations(mActivityAnimations[8]);
+                        animAttr = enter
+                                ? animArray[1]
+                                : animArray[0];
+                    } else {
+                        animAttr = enter
+                                ? WindowAnimation_wallpaperIntraOpenEnterAnimation
+                                : WindowAnimation_wallpaperIntraOpenExitAnimation;
+                    }
                     break;
                 case TRANSIT_WALLPAPER_INTRA_CLOSE:
-                    animAttr = enter
-                            ? WindowAnimation_wallpaperIntraCloseEnterAnimation
-                            : WindowAnimation_wallpaperIntraCloseExitAnimation;
+                    if (mActivityAnimations[9] != 0) {
+                        mIsResId = true;
+                        int[] animArray = AwesomeAnimationHelper.getAnimations(mActivityAnimations[9]);
+                        animAttr = enter
+                                ? animArray[1]
+                                : animArray[0];
+                    } else {
+                        animAttr = enter
+                                ? WindowAnimation_wallpaperIntraCloseEnterAnimation
+                                : WindowAnimation_wallpaperIntraCloseExitAnimation;
+                    }
                     break;
             }
             a = animAttr != 0 ? loadAnimation(lp, animAttr) : null;
+            if (a != null) {
+                if (mAnimationDuration > 0) {
+                    a.setDuration(mAnimationDuration);
+                }
+            }
+            mIsResId = false;
             if (DEBUG_APP_TRANSITIONS || DEBUG_ANIM) Slog.v(TAG,
                     "applyAnimation:"
-                    + " anim=" + a
-                    + " animAttr=0x" + Integer.toHexString(animAttr)
-                    + " transit=" + transit + " isEntrance=" + enter
-                    + " Callers=" + Debug.getCallers(3));
+                            + " anim=" + a
+                            + " animAttr=0x" + Integer.toHexString(animAttr)
+                            + " transit=" + transit + " isEntrance=" + enter
+                            + " Callers=" + Debug.getCallers(3));
         }
         return a;
     }
@@ -583,7 +718,8 @@ public class AppTransition implements Dump {
     }
 
     void overridePendingAppTransition(String packageName, int enterAnim, int exitAnim,
-                                             IRemoteCallback startedCallback) {
+                                      IRemoteCallback startedCallback) {
+        if (mNoOverrides) return;
         if (isTransitionSet()) {
             mNextAppTransitionType = NEXT_TRANSIT_TYPE_CUSTOM;
             mNextAppTransitionPackage = packageName;
@@ -598,7 +734,8 @@ public class AppTransition implements Dump {
     }
 
     void overridePendingAppTransitionScaleUp(int startX, int startY, int startWidth,
-                                                    int startHeight) {
+                                             int startHeight) {
+        if (mNoOverrides) return;
         if (isTransitionSet()) {
             mNextAppTransitionType = NEXT_TRANSIT_TYPE_SCALE_UP;
             mNextAppTransitionPackage = null;
@@ -614,6 +751,7 @@ public class AppTransition implements Dump {
 
     void overridePendingAppTransitionThumb(Bitmap srcThumb, int startX, int startY,
                                            IRemoteCallback startedCallback, boolean scaleUp) {
+        if (mNoOverrides) return;
         if (isTransitionSet()) {
             mNextAppTransitionType = scaleUp ? NEXT_TRANSIT_TYPE_THUMBNAIL_SCALE_UP
                     : NEXT_TRANSIT_TYPE_THUMBNAIL_SCALE_DOWN;
@@ -722,37 +860,41 @@ public class AppTransition implements Dump {
     @Override
     public void dump(PrintWriter pw) {
         pw.print(" " + this);
-        pw.print(" mAppTransitionState="); pw.println(appStateToString());
+        pw.print(" mAppTransitionState=");
+        pw.println(appStateToString());
         if (mNextAppTransitionType != NEXT_TRANSIT_TYPE_NONE) {
-            pw.print("  mNextAppTransitionType="); pw.println(transitTypeToString());
+            pw.print("  mNextAppTransitionType=");
+            pw.println(transitTypeToString());
         }
         switch (mNextAppTransitionType) {
             case NEXT_TRANSIT_TYPE_CUSTOM:
                 pw.print("  mNextAppTransitionPackage=");
-                        pw.println(mNextAppTransitionPackage);
+                pw.println(mNextAppTransitionPackage);
                 pw.print("  mNextAppTransitionEnter=0x");
-                        pw.print(Integer.toHexString(mNextAppTransitionEnter));
-                        pw.print(" mNextAppTransitionExit=0x");
-                        pw.println(Integer.toHexString(mNextAppTransitionExit));
+                pw.print(Integer.toHexString(mNextAppTransitionEnter));
+                pw.print(" mNextAppTransitionExit=0x");
+                pw.println(Integer.toHexString(mNextAppTransitionExit));
                 break;
             case NEXT_TRANSIT_TYPE_SCALE_UP:
-                pw.print("  mNextAppTransitionStartX="); pw.print(mNextAppTransitionStartX);
-                        pw.print(" mNextAppTransitionStartY=");
-                        pw.println(mNextAppTransitionStartY);
+                pw.print("  mNextAppTransitionStartX=");
+                pw.print(mNextAppTransitionStartX);
+                pw.print(" mNextAppTransitionStartY=");
+                pw.println(mNextAppTransitionStartY);
                 pw.print("  mNextAppTransitionStartWidth=");
-                        pw.print(mNextAppTransitionStartWidth);
-                        pw.print(" mNextAppTransitionStartHeight=");
-                        pw.println(mNextAppTransitionStartHeight);
+                pw.print(mNextAppTransitionStartWidth);
+                pw.print(" mNextAppTransitionStartHeight=");
+                pw.println(mNextAppTransitionStartHeight);
                 break;
             case NEXT_TRANSIT_TYPE_THUMBNAIL_SCALE_UP:
             case NEXT_TRANSIT_TYPE_THUMBNAIL_SCALE_DOWN:
                 pw.print("  mNextAppTransitionThumbnail=");
-                        pw.print(mNextAppTransitionThumbnail);
-                        pw.print(" mNextAppTransitionStartX=");
-                        pw.print(mNextAppTransitionStartX);
-                        pw.print(" mNextAppTransitionStartY=");
-                        pw.println(mNextAppTransitionStartY);
-                pw.print("  mNextAppTransitionScaleUp="); pw.println(mNextAppTransitionScaleUp);
+                pw.print(mNextAppTransitionThumbnail);
+                pw.print(" mNextAppTransitionStartX=");
+                pw.print(mNextAppTransitionStartX);
+                pw.print(" mNextAppTransitionStartY=");
+                pw.println(mNextAppTransitionStartY);
+                pw.print("  mNextAppTransitionScaleUp=");
+                pw.println(mNextAppTransitionScaleUp);
                 break;
         }
         if (mNextAppTransitionCallback != null) {
@@ -763,5 +905,40 @@ public class AppTransition implements Dump {
 
     public void setCurrentUser(int newUserId) {
         mCurrentUserId = newUserId;
+    }
+
+    private class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.ANIMATION_CONTROLS_DURATION), false, this);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.ANIMATION_CONTROLS_NO_OVERRIDE), false, this);
+            for (int i = 0; i < 10; i++) {
+                resolver.registerContentObserver(
+                        Settings.System.getUriFor(Settings.System.ACTIVITY_ANIMATION_CONTROLS[i]), false, this);
+            }
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            updateSettings();
+        }
+    }
+
+    private void updateSettings() {
+        ContentResolver resolver = mContext.getContentResolver();
+        for (int i = 0; i < 10; i++) {
+            mActivityAnimations[i] = Settings.System.getInt(resolver, Settings.System.ACTIVITY_ANIMATION_CONTROLS[i], 0);
+        }
+
+        mNoOverrides = ((Settings.System.getInt(resolver, Settings.System.ANIMATION_CONTROLS_NO_OVERRIDE, 0) == 1) ? true : false);
+
+        int temp = Settings.System.getInt(resolver, Settings.System.ANIMATION_CONTROLS_DURATION, 0);
+        mAnimationDuration = temp * 15;
     }
 }

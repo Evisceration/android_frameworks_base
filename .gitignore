@@ -2,3 +2,4 @@ packages/SystemUI/gen/
 packages/SystemUI/tests/
 *.iml
 gen/
+packages/SystemUI/Settings.iml

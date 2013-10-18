@@ -45,8 +45,9 @@ public class QSConstants {
             TILES_DEFAULT.add(TILE_MOBILEDATA);
             TILES_DEFAULT.add(TILE_GPS);
             TILES_DEFAULT.add(TILE_TORCH);
+            TILES_DEFAULT.add(TILE_BLUETOOTH);
             TILES_DEFAULT.add(TILE_BATTERY);
             TILES_DEFAULT.add(TILE_AIRPLANE);
-            TILES_DEFAULT.add(TILE_BLUETOOTH);
+            TILES_DEFAULT.add(TILE_HALO);
         }
 }

@@ -246,7 +246,7 @@
     <dimen name="pie_sysinfo_height">85sp</dimen>
 
     <!-- Active Display -->
-    <!-- Top margin for overflow notifications container shown in the P.O.R.N. view -->
+    <!-- Top margin for overflow notifications container shown in the Active Display view -->
     <dimen name="glowpad_overflow_notifications_margin_top">64dp</dimen>
 
     <!-- Top margin for overflow notifications container shown in the active display view -->
@@ -274,10 +274,10 @@
     <dimen name="ad_ampm_font_size">32dp</dimen>
 
     <!-- Battery bar height -->
-    <dimen name="battery_bar_height">2dp</dimen>
+    <dimen name="battery_bar_height">1dp</dimen>
 
     <!-- Network stats text size -->
-    <dimen name="network_stats_text_size">8dp</dimen>
+    <dimen name="network_stats_text_size">7dp</dimen>
 
     <!-- Halo -->
     <dimen name="halo_bubble_size">75dp</dimen>

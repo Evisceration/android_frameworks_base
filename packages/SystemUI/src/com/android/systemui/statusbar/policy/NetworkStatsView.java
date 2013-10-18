@@ -31,6 +31,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.android.systemui.R;
 
 public class NetworkStatsView extends LinearLayout {
@@ -73,7 +74,7 @@ public class NetworkStatsView extends LinearLayout {
     // runnable to invalidate view via mHandler.postDelayed() call
     private final Runnable mUpdateRunnable = new Runnable() {
         public void run() {
-            if(mActivated && mAttached) {
+            if (mActivated && mAttached) {
                 updateStats();
                 invalidate();
             }
@@ -99,7 +100,7 @@ public class NetworkStatsView extends LinearLayout {
         public void onChange(boolean selfChange) {
             // check for connectivity
             ConnectivityManager cm =
-                    (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                    (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
             NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
             boolean networkAvailable = activeNetwork != null ? activeNetwork.isConnected() : false;
@@ -192,7 +193,7 @@ public class NetworkStatsView extends LinearLayout {
         }
 
         tv.setText(fSpeed == (int) fSpeed ?
-                String.format("%d %s", (int)fSpeed, units) :
-                String.format("%.1f %s", fSpeed, units));
+                String.format("%d %s ", (int) fSpeed, units) :
+                String.format("%.1f %s ", fSpeed, units));
     }
 }

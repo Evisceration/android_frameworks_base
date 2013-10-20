@@ -16,27 +16,19 @@
 
 package android.view;
 
-import android.graphics.Point;
-import com.android.internal.view.IInputContext;
-import com.android.internal.view.IInputMethodClient;
-
 import android.content.res.CompatibilityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.IRemoteCallback;
 import android.os.RemoteException;
 import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.IApplicationToken;
-import android.view.IInputFilter;
-import android.view.IOnKeyguardExitResult;
-import android.view.IRotationWatcher;
-import android.view.IWindowManager;
-import android.view.IWindowSession;
+
+import com.android.internal.view.IInputContext;
+import com.android.internal.view.IInputMethodClient;
 
 import java.util.List;
 
@@ -53,7 +45,7 @@ public class IWindowManagerImpl implements IWindowManager {
     private final boolean mHasNavigationBar;
 
     public IWindowManagerImpl(Configuration config, DisplayMetrics metrics, int rotation,
-            boolean hasSystemNavBar, boolean hasNavigationBar) {
+                              boolean hasSystemNavBar, boolean hasNavigationBar) {
         mConfig = config;
         mMetrics = metrics;
         mRotation = rotation;
@@ -237,20 +229,20 @@ public class IWindowManagerImpl implements IWindowManager {
 
     @Override
     public void overridePendingAppTransition(String arg0, int arg1, int arg2,
-            IRemoteCallback startedCallback) throws RemoteException {
+                                             IRemoteCallback startedCallback) throws RemoteException {
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void overridePendingAppTransitionScaleUp(int startX, int startY, int startWidth,
-            int startHeight) throws RemoteException {
+                                                    int startHeight) throws RemoteException {
         // TODO Auto-generated method stub
     }
 
     @Override
     public void overridePendingAppTransitionThumb(Bitmap srcThumb, int startX, int startY,
-            IRemoteCallback startedCallback, boolean scaleUp) throws RemoteException {
+                                                  IRemoteCallback startedCallback, boolean scaleUp) throws RemoteException {
         // TODO Auto-generated method stub
     }
 
@@ -322,7 +314,7 @@ public class IWindowManagerImpl implements IWindowManager {
 
     @Override
     public void setAppStartingWindow(IBinder arg0, String arg1, int arg2, CompatibilityInfo arg3,
-            CharSequence arg4, int arg5, int arg6, int arg7, IBinder arg8, boolean arg9)
+                                     CharSequence arg4, int arg5, int arg6, int arg7, IBinder arg8, boolean arg9)
             throws RemoteException {
         // TODO Auto-generated method stub
     }
@@ -533,5 +525,43 @@ public class IWindowManagerImpl implements IWindowManager {
     @Override
     public boolean hasMenuKeyEnabled() {
         return true;
+    }
+
+    @Override
+    public void showStatusBar()
+            throws RemoteException {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void hideStatusBar()
+            throws RemoteException {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public boolean shouldHideStatusBar()
+            throws RemoteException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void showNavbar()
+            throws RemoteException {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void hideNavbar()
+            throws RemoteException {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public boolean shouldHideNavbar()
+            throws RemoteException {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

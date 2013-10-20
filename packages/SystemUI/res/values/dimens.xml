@@ -292,4 +292,7 @@
     <dimen name="halo_speech_vpadding_bottom">3dp</dimen>
     <dimen name="halo_content_max_width">250dp</dimen>
 
+    <!-- Height of trigger for revealing a hidden status bar or navbar -->
+    <dimen name="trigger_view_height">2dip</dimen>
+
 </resources>

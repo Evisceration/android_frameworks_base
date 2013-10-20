@@ -449,6 +449,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mTopIsFullscreen;
     boolean mForceStatusBar;
     boolean mForceStatusBarFromKeyguard;
+    boolean mForceStatusBarFromUI;
+    boolean mForceNavbarFromUI;
     boolean mHideLockScreen;
     boolean mForcingShowNavBar;
     int mForcingShowNavBarLayer;
@@ -3122,7 +3124,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // input window to catch all touch events.  This way we can
             // detect when the user presses anywhere to bring back the nav
             // bar and ensure the application doesn't see the event.
-            if (navVisible) {
+            if (navVisible || mForceNavbarFromUI) {
                 if (mHideNavFakeWindow != null) {
                     mHideNavFakeWindow.dismiss();
                     mHideNavFakeWindow = null;
@@ -3177,7 +3179,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     int left = displayWidth - overscanRight - navWidth;
                     mTmpNavigationFrame.set(left, 0, displayWidth - overscanRight, displayHeight);
                     mStableRight = mStableFullscreenRight = mTmpNavigationFrame.left;
-                    if (navVisible) {
+                    if (navVisible || mForceNavbarFromUI) {
                         mNavigationBar.showLw(true);
                         mDockRight = mTmpNavigationFrame.left;
                         mRestrictedScreenWidth = mDockRight - mRestrictedScreenLeft;
@@ -3846,7 +3848,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (DEBUG_LAYOUT) Log.i(TAG, "force=" + mForceStatusBar
                     + " forcefkg=" + mForceStatusBarFromKeyguard
                     + " top=" + mTopFullscreenOpaqueWindowState);
-            if (mForceStatusBar || mForceStatusBarFromKeyguard
+            if (mForceStatusBar || mForceStatusBarFromKeyguard || mForceStatusBarFromUI
                     && !expandedDesktopHidesStatusBar()) {
                 if (DEBUG_LAYOUT) Log.v(TAG, "Showing status bar: forced");
                 if (mStatusBar.showLw(true)) changes |= FINISH_LAYOUT_REDO_LAYOUT;
@@ -5874,5 +5876,50 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     public void setBarTranslucentAllowed(boolean allowed) {
         mBarsAreTranslucent = allowed;
+    }
+
+    @Override
+    public void showStatusBar() {
+        if (mStatusBar != null && shouldHideStatusBar()) {
+            mForceStatusBarFromUI = true;
+            mStatusBar.showLw(true);
+        }
+    }
+
+    @Override
+    public void hideStatusBar() {
+        if (mStatusBar != null) {
+            mForceStatusBarFromUI = false;
+            mStatusBar.hideLw(true);
+        }
+    }
+
+    @Override
+    public boolean shouldHideStatusBar() {
+        return mTopIsFullscreen ||
+                Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.EXPANDED_DESKTOP_STATE, 0) == 1;
+    }
+
+    @Override
+    public void showNavbar() {
+        if (mNavigationBar != null && shouldHideNavbar()) {
+            mForceNavbarFromUI = true;
+            mNavigationBar.showLw(true);
+        }
+    }
+
+    @Override
+    public void hideNavbar() {
+        if (mNavigationBar != null) {
+            mForceNavbarFromUI = false;
+            mNavigationBar.hideLw(true);
+        }
+    }
+
+    @Override
+    public boolean shouldHideNavbar() {
+        return  Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.EXPANDED_DESKTOP_STATE, 0) == 1;
     }
 }

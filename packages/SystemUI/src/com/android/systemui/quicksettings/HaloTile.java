@@ -2,20 +2,25 @@ package com.android.systemui.quicksettings;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.Settings;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.widget.Toast;
 
 import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 public class HaloTile extends QuickSettingsTile {
     private static final String TAG = "HaloTile";
+    private final Context mContext;
 
     public HaloTile(Context context, QuickSettingsController qsc) {
         super(context, qsc);
+        mContext = context;
 
         mOnClick = new OnClickListener() {
             @Override
@@ -27,7 +32,15 @@ public class HaloTile extends QuickSettingsTile {
         mOnLongClick = new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                startSettingsActivity(Settings.ACTION_CUSTOM_SETTINGS);
+                try {
+                    PackageManager pm = mContext.getPackageManager();
+                    Intent appStartIntent = pm.getLaunchIntentForPackage("com.paranoid.halo");
+                    if (null != appStartIntent) {
+                        mContext.startActivity(appStartIntent);
+                    }
+                } catch (Exception ignored) {
+                    Toast.makeText(mContext, "HALO App not found!", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
         };

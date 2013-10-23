@@ -3162,7 +3162,6 @@ public class PhoneStatusBar extends BaseStatusBar {
         } catch (RemoteException ex) {
             // do nothing
         }
-        Log.e(TAG, "Translucent? " + translucent);
         mPixelFormat = translucent ? PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE;
 
         mStatusBarView.getBackground().setAlpha(translucent ? 128 : 255);

@@ -626,6 +626,8 @@ public class PhoneStatusBar extends BaseStatusBar {
                     }
                 });
 
+        addActiveDisplayView();
+
         // figure out which pixel-format to use for the status bar.
         updateTranslucentStatus();
 
@@ -2572,7 +2574,7 @@ public class PhoneStatusBar extends BaseStatusBar {
         setAreThereNotifications();
     }
 
-    private boolean areLightsOn() {
+    public boolean areLightsOn() {
         return 0 == (mSystemUiVisibility & View.SYSTEM_UI_FLAG_LOW_PROFILE);
     }
 
@@ -2590,6 +2592,10 @@ public class PhoneStatusBar extends BaseStatusBar {
             mWindowManagerService.statusBarVisibilityChanged(mSystemUiVisibility);
         } catch (RemoteException ex) {
         }
+    }
+
+    public void setNavigationBarLightsOn(boolean on, boolean force) {
+        mNavigationBarView.setLowProfile(!on, true, force);
     }
 
     @Override

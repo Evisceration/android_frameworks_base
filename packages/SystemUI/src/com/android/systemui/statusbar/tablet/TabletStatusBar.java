@@ -705,6 +705,8 @@ public class TabletStatusBar extends BaseStatusBar implements
         xition.setStartDelay(LayoutTransition.DISAPPEARING, 0);
         ((ViewGroup)sb.findViewById(R.id.bar_shadow_holder)).setLayoutTransition(xition);
 
+        addActiveDisplayView();
+
         // set the initial view visibility
         setAreThereNotifications();
 

@@ -38,6 +38,7 @@ public class BatteryBar extends View {
     private static final long ANIMATION_RESTART_DELAY = 2000;
 
     private Handler mHandler;
+    private SettingsObserver mSettingsObserver;
     private Context mContext;
     private BatteryReceiver mBatteryReceiver = null;
 
@@ -166,8 +167,8 @@ public class BatteryBar extends View {
         mContext = context;
         mHandler = new Handler();
 
-        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
-        settingsObserver.observe();
+        mSettingsObserver = new SettingsObserver(mHandler);
+        mSettingsObserver.observe();
         mBatteryReceiver = new BatteryReceiver(mContext);
 
         mPaint = new Paint();
@@ -237,6 +238,7 @@ public class BatteryBar extends View {
         if (mAttached) {
             mAttached = false;
             mBatteryReceiver.updateRegistration();
+            getContext().getContentResolver().unregisterContentObserver(mSettingsObserver);
         }
     }
 

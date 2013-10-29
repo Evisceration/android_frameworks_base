@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
@@ -21,7 +22,7 @@ import android.widget.RelativeLayout;
 
 public class AokpBatteryBar extends RelativeLayout implements Animatable {
 
-    private static final String TAG = BatteryBar.class.getSimpleName();
+    private static final String TAG = AokpBatteryBar.class.getSimpleName();
 
     // Total animation duration
     private static final int ANIM_DURATION = 1000; // 5 seconds
@@ -34,9 +35,10 @@ public class AokpBatteryBar extends RelativeLayout implements Animatable {
     private boolean isAnimating = false;
 
     private Handler mHandler = new Handler();
+    private SettingsObserver mSettingsObserver;
 
-    LinearLayout mBatteryBarLayout;
-    View mBatteryBar;
+    LinearLayout mAokpBatteryBarLayout;
+    View mAokpBatteryBar;
 
     LinearLayout mChargerLayout;
     View mCharger;
@@ -103,12 +105,12 @@ public class AokpBatteryBar extends RelativeLayout implements Animatable {
         if (!mAttached) {
             mAttached = true;
 
-            mBatteryBarLayout = new LinearLayout(mContext);
-            addView(mBatteryBarLayout, new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+            mAokpBatteryBarLayout = new LinearLayout(mContext);
+            addView(mAokpBatteryBarLayout, new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.MATCH_PARENT));
 
-            mBatteryBar = new View(mContext);
-            mBatteryBarLayout.addView(mBatteryBar, new LinearLayout.LayoutParams(
+            mAokpBatteryBar = new View(mContext);
+            mAokpBatteryBarLayout.addView(mAokpBatteryBar, new LinearLayout.LayoutParams(
                     LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
             DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
@@ -136,8 +138,8 @@ public class AokpBatteryBar extends RelativeLayout implements Animatable {
             filter.addAction(Intent.ACTION_SCREEN_ON);
             getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
 
-            SettingsObserver observer = new SettingsObserver(mHandler);
-            observer.observer();
+            mSettingsObserver = new SettingsObserver(mHandler);
+            mSettingsObserver.observer();
             updateSettings();
         }
     }
@@ -148,6 +150,7 @@ public class AokpBatteryBar extends RelativeLayout implements Animatable {
         if (mAttached) {
             mAttached = false;
             getContext().unregisterReceiver(mIntentReceiver);
+            getContext().getContentResolver().unregisterContentObserver(mSettingsObserver);
         }
     }
 
@@ -191,24 +194,24 @@ public class AokpBatteryBar extends RelativeLayout implements Animatable {
         }
         setProgress(mBatteryLevel);
 
-        mBatteryBar.setBackgroundColor(color);
+        mAokpBatteryBar.setBackgroundColor(color);
         mCharger.setBackgroundColor(color);
     }
 
     private void setProgress(int n) {
         if (vertical) {
             int w = (int) (((getHeight() / 100.0) * n) + 0.5);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mBatteryBarLayout
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mAokpBatteryBarLayout
                     .getLayoutParams();
             params.height = w;
-            mBatteryBarLayout.setLayoutParams(params);
+            mAokpBatteryBarLayout.setLayoutParams(params);
 
         } else {
             int w = (int) (((getWidth() / 100.0) * n) + 0.5);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mBatteryBarLayout
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mAokpBatteryBarLayout
                     .getLayoutParams();
             params.width = w;
-            mBatteryBarLayout.setLayoutParams(params);
+            mAokpBatteryBarLayout.setLayoutParams(params);
         }
 
     }
@@ -220,14 +223,14 @@ public class AokpBatteryBar extends RelativeLayout implements Animatable {
 
         if (vertical) {
             TranslateAnimation a = new TranslateAnimation(getX(), getX(), getHeight(),
-                    mBatteryBarLayout.getHeight());
+                    mAokpBatteryBarLayout.getHeight());
             a.setInterpolator(new AccelerateInterpolator());
             a.setDuration(ANIM_DURATION);
             a.setRepeatCount(Animation.INFINITE);
             mChargerLayout.startAnimation(a);
             mChargerLayout.setVisibility(View.VISIBLE);
         } else {
-            TranslateAnimation a = new TranslateAnimation(getWidth(), mBatteryBarLayout.getWidth(),
+            TranslateAnimation a = new TranslateAnimation(getWidth(), mAokpBatteryBarLayout.getWidth(),
                     getTop(), getTop());
             a.setInterpolator(new AccelerateInterpolator());
             a.setDuration(ANIM_DURATION);

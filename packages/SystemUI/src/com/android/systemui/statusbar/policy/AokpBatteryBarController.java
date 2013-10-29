@@ -16,18 +16,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import java.util.ArrayList;
+
 public class AokpBatteryBarController extends LinearLayout {
 
-    private static final String TAG = "BatteryBarController";
+    private static final String TAG = "AokpBatteryBarController";
 
     BatteryBar mainBar;
     BatteryBar alternateStyleBar;
+    GlobalSettingsObserver mSettingsObserver;
 
     public static final int STYLE_REGULAR = 0;
     public static final int STYLE_SYMMETRIC = 1;
 
-    int mStyle = STYLE_REGULAR;
-    int mLocation = 0;
+    static int mStyle = STYLE_REGULAR;
+    static int mLocation = 0;
 
     protected final static int CURRENT_LOC = 1;
     int mLocationToLookFor = 0;
@@ -38,13 +41,38 @@ public class AokpBatteryBarController extends LinearLayout {
     boolean isAttached = false;
     boolean isVertical = false;
 
-    class SettingsObserver extends ContentObserver {
+    static class GlobalSettingsObserver extends ContentObserver {
+        private static GlobalSettingsObserver sInstance;
+        private ArrayList<AokpBatteryBarController> mAokpBatteryBarControllers = new ArrayList<AokpBatteryBarController>();
+        private Context mContext;
 
-        public SettingsObserver(Handler handler) {
+        public GlobalSettingsObserver(Handler handler, Context context) {
             super(handler);
+            mContext = context.getApplicationContext();
         }
 
-        void observer() {
+        static GlobalSettingsObserver getInstance(Context context) {
+            if (sInstance == null) {
+                sInstance = new GlobalSettingsObserver(new Handler(), context);
+            }
+            return sInstance;
+        }
+
+        void attach(AokpBatteryBarController bbc) {
+            if (mAokpBatteryBarControllers.isEmpty()) {
+                observe();
+            }
+            mAokpBatteryBarControllers.add(bbc);
+        }
+
+        void detach(AokpBatteryBarController bbc) {
+            mAokpBatteryBarControllers.remove(bbc);
+            if (mAokpBatteryBarControllers.isEmpty()) {
+                unobserve();
+            }
+        }
+
+        void observe() {
             ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.STATUSBAR_BATTERY_BAR), false, this);
@@ -56,9 +84,31 @@ public class AokpBatteryBarController extends LinearLayout {
                     false, this);
         }
 
+        void unobserve() {
+            mContext.getContentResolver().unregisterContentObserver(this);
+        }
+
         @Override
         public void onChange(boolean selfChange) {
-            updateSettings();
+            this.updateSettings();
+        }
+
+        void updateSettings() {
+            mStyle = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.STATUSBAR_BATTERY_BAR_STYLE, 0);
+            mLocation = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.STATUSBAR_BATTERY_BAR, 0);
+
+            for (AokpBatteryBarController bbc : mAokpBatteryBarControllers) {
+                if (bbc.mLocationToLookFor == mLocation) {
+                    bbc.removeBars();
+                    bbc.addBars();
+                    bbc.setVisibility(View.VISIBLE);
+                } else {
+                    bbc.removeBars();
+                    bbc.setVisibility(View.GONE);
+                }
+            }
         }
     }
 
@@ -69,6 +119,7 @@ public class AokpBatteryBarController extends LinearLayout {
             String ns = "http://schemas.android.com/apk/res/com.android.systemui";
             mLocationToLookFor = attrs.getAttributeIntValue(ns, "viewLocation", 0);
         }
+        mSettingsObserver = GlobalSettingsObserver.getInstance(context);
     }
 
     @Override
@@ -82,8 +133,7 @@ public class AokpBatteryBarController extends LinearLayout {
             filter.addAction(Intent.ACTION_BATTERY_CHANGED);
             getContext().registerReceiver(mIntentReceiver, filter);
 
-            SettingsObserver observer = new SettingsObserver(new Handler());
-            observer.observer();
+            mSettingsObserver.attach(this);
             updateSettings();
         }
     }
@@ -106,6 +156,7 @@ public class AokpBatteryBarController extends LinearLayout {
         if (isAttached) {
             isAttached = false;
             removeBars();
+            mSettingsObserver.detach(this);
         }
         super.onDetachedFromWindow();
     }

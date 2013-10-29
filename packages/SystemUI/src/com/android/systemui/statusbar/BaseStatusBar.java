@@ -30,6 +30,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
@@ -1580,9 +1581,18 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
     }
 
+    protected static void setSystemUIVisibility(View v, int visibility) {
+        v.setSystemUiVisibility(visibility);
+    }
+
     protected void addActiveDisplayView() {
         mActiveDisplayView = (ActiveDisplayView) View.inflate(mContext, R.layout.active_display, null);
         mWindowManager.addView(mActiveDisplayView, getActiveDisplayViewLayoutParams());
+        int activeDisplayVis = View.SYSTEM_UI_FLAG_LOW_PROFILE
+                             | View.SYSTEM_UI_FLAG_FULLSCREEN
+                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+        setSystemUIVisibility(mActiveDisplayView, activeDisplayVis);
         mActiveDisplayView.setStatusBar(this);
     }
 
@@ -1604,6 +1614,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                         | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH,
                 PixelFormat.TRANSLUCENT);
         lp.gravity = Gravity.TOP | Gravity.FILL_VERTICAL | Gravity.FILL_HORIZONTAL;
+        lp.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         lp.setTitle("ActiveDisplayView");
 
         return lp;

@@ -51,6 +51,7 @@ import android.view.accessibility.AccessibilityManager;
 
 import com.android.internal.R;
 
+import java.lang.Math;
 import java.util.ArrayList;
 
 /**
@@ -1321,7 +1322,7 @@ public class GlowPadView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         mPointCloud.draw(canvas);
-        mOuterRing.draw(canvas);
+        if (mDrawOuterRing) mOuterRing.draw(canvas);
         final int ntargets = mTargetDrawables.size();
         for (int i = 0; i < ntargets; i++) {
             TargetDrawable target = mTargetDrawables.get(i);

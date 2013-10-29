@@ -601,6 +601,10 @@ public class PhoneStatusBar extends BaseStatusBar {
             // no window manager? good luck with that
         }
 
+        if (!mRecreating) {
+            addActiveDisplayView();
+        }
+
         mStatusBarTrigger = (TriggerView) View.inflate(context, R.layout.trigger_view, null);
         mWindowManager.addView(mStatusBarTrigger, getStatusBarTriggerViewLayoutParams());
         if (DEBUG_TRIGGERS)
@@ -623,8 +627,6 @@ public class PhoneStatusBar extends BaseStatusBar {
                         }
                     }
                 });
-
-        addActiveDisplayView();
 
         // figure out which pixel-format to use for the status bar.
         updateTranslucentStatus();

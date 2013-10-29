@@ -22,28 +22,32 @@
 
 <com.android.systemui.statusbar.SignalClusterView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_width="wrap_content"
     android:orientation="horizontal"
     >
     <FrameLayout
         android:id="@+id/wifi_combo"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_width="wrap_content"
         android:layout_marginEnd="-6dp"
         >
         <ImageView
             android:id="@+id/wifi_signal"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_width="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:scaleType="center"
+            android:layout_gravity="fill_vertical"
+            android:scaleType="fitCenter"
+            android:paddingTop="@dimen/status_bar_icon_top_padding"
+            android:paddingBottom="@dimen/status_bar_icon_bottom_padding"
             />
         <ImageView
             android:id="@+id/wifi_inout"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_gravity="center|bottom"
+            android:paddingTop="@dimen/status_bar_icon_top_padding"
+            android:paddingBottom="@dimen/status_bar_icon_bottom_padding"
             />
     </FrameLayout>
     <View
@@ -75,7 +79,7 @@
     </FrameLayout>
     -->
     <FrameLayout
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_width="wrap_content"
         >
         <View
@@ -86,23 +90,31 @@
         <FrameLayout
             android:id="@+id/mobile_combo"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             >
             <ImageView
                 android:id="@+id/mobile_signal"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_width="wrap_content"
+                android:scaleType="fitCenter"
+                android:layout_gravity="fill_vertical"
+                android:paddingTop="@dimen/status_bar_icon_top_padding"
+                android:paddingBottom="@dimen/status_bar_icon_bottom_padding"
                 />
             <ImageView
                 android:id="@+id/mobile_type"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_width="wrap_content"
+                android:paddingTop="@dimen/status_bar_icon_top_padding"
+                android:paddingBottom="@dimen/status_bar_icon_bottom_padding"
                 />
             <ImageView
                 android:id="@+id/mobile_inout"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_width="wrap_content"
                 android:layout_gravity="end|bottom"
+                android:paddingTop="@dimen/status_bar_icon_top_padding"
+                android:paddingBottom="@dimen/status_bar_icon_bottom_padding"
                 />
             <ImageView
                 android:id="@+id/no_sim"
@@ -113,12 +125,16 @@
     </FrameLayout>
     <ImageView
         android:id="@+id/airplane"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_width="wrap_content"
+        android:scaleType="fitCenter"
+        android:gravity="center"
+        android:paddingTop="@dimen/status_bar_icon_top_padding"
+        android:paddingBottom="@dimen/status_bar_icon_bottom_padding"
         />
     <ImageView
         android:id="@+id/ethernet"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_width="wrap_content"
         />
 </com.android.systemui.statusbar.SignalClusterView>

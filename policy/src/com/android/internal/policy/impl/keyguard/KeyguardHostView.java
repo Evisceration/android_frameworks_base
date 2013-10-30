@@ -467,6 +467,9 @@ public class KeyguardHostView extends KeyguardViewBase {
         }
 
         Drawable back = null;
+        int bgAlpha = (int)((1 - (Settings.System.getFloat(getContext().getContentResolver(),
+                Settings.System.LOCKSCREEN_ALPHA_CONFIG, 0.0f))) * 255);
+
         if (!background.isEmpty()) {
             try {
                 back = new ColorDrawable(Integer.parseInt(background));

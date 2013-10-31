@@ -483,7 +483,7 @@ public class ActiveDisplayView extends FrameLayout {
             if (mNotification == null) {
                 mNotification = getNextAvailableNotification();
             }
-            showNotification(mNotification, true);
+            if (mNotification != null) showNotification(mNotification, true);
             if (mBar instanceof TabletStatusBar) mBar.disable(0xffffffff);
         }
     }
@@ -580,6 +580,7 @@ public class ActiveDisplayView extends FrameLayout {
                             mNotification.getPackageName(), mNotification.getTag(),
                             mNotification.getId());
                 } catch (RemoteException re) {
+		} catch (NullPointerException npe) {
                 } catch (CanceledException ce) {
                 }
             }
@@ -1136,7 +1137,7 @@ public class ActiveDisplayView extends FrameLayout {
             if (ACTION_REDISPLAY_NOTIFICATION.equals(action)) {
                 if (mNotification == null)
                     mNotification = getNextAvailableNotification();
-                else showNotification(mNotification, true);
+                if (mNotification != null) showNotification(mNotification, true);
             } else if (ACTION_DISPLAY_TIMEOUT.equals(action)) {
                 turnScreenOff();
             } else if (Intent.ACTION_SCREEN_OFF.equals(action)) {
@@ -1146,7 +1147,7 @@ public class ActiveDisplayView extends FrameLayout {
             } else if (ACTION_FORCE_DISPLAY.equals(action)) {
                 if (mNotification == null)
                     mNotification = getNextAvailableNotification();
-                else showNotification(mNotification, true);
+                if (mNotification != null) showNotification(mNotification, true);
                 restoreBrightness();
             }
         }

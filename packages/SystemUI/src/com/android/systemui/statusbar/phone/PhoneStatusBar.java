@@ -39,9 +39,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.CustomTheme;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.database.ContentObserver;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -64,8 +61,8 @@ import android.os.UserHandle;
 import android.provider.Settings;
 import android.service.dreams.DreamService;
 import android.service.dreams.IDreamManager;
-import android.telephony.MSimTelephonyManager;
 import android.service.notification.StatusBarNotification;
+import android.telephony.MSimTelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.EventLog;
 import android.util.Log;
@@ -106,7 +103,6 @@ import com.android.systemui.statusbar.NotificationData.Entry;
 import com.android.systemui.statusbar.SignalClusterTextView;
 import com.android.systemui.statusbar.SignalClusterView;
 import com.android.systemui.statusbar.StatusBarIconView;
-import com.android.systemui.statusbar.policy.BatteryBarController;
 import com.android.systemui.statusbar.policy.BatteryController;
 import com.android.systemui.statusbar.policy.BluetoothController;
 import com.android.systemui.statusbar.policy.CircleBattery;
@@ -197,7 +193,7 @@ public class PhoneStatusBar extends BaseStatusBar {
 
     // These are no longer handled by the policy, because we need custom strategies for them
     BluetoothController mBluetoothController;
-    BatteryBarController mBatteryController;
+    BatteryController mBatteryController;
     DockBatteryController mDockBatteryController;
     LocationController mLocationController;
     NetworkController mNetworkController;
@@ -757,13 +753,13 @@ public class PhoneStatusBar extends BaseStatusBar {
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
             mMSimNetworkController = new MSimNetworkController(mContext);
             MSimSignalClusterView mSimSignalCluster = (MSimSignalClusterView)
-              mStatusBarView.findViewById(R.id.msim_signal_cluster);
-            for (int i=0; i < MSimTelephonyManager.getDefault().getPhoneCount(); i++) {
+                    mStatusBarView.findViewById(R.id.msim_signal_cluster);
+            for (int i = 0; i < MSimTelephonyManager.getDefault().getPhoneCount(); i++) {
                 mMSimNetworkController.addSignalCluster(mSimSignalCluster, i);
             }
             mSimSignalCluster.setNetworkController(mMSimNetworkController);
-            mEmergencyCallLabel = (TextView)mStatusBarWindow.findViewById(
-                                                          R.id.emergency_calls_only);
+            mEmergencyCallLabel = (TextView) mStatusBarWindow.findViewById(
+                    R.id.emergency_calls_only);
             if (mEmergencyCallLabel != null) {
                 mMSimNetworkController.addEmergencyLabelView(mEmergencyCallLabel);
                 mEmergencyCallLabel.setOnClickListener(new View.OnClickListener() {
@@ -780,9 +776,10 @@ public class PhoneStatusBar extends BaseStatusBar {
                 });
             }
 
-            mCarrierLabel = (TextView)mStatusBarWindow.findViewById(R.id.carrier_label);
+            mCarrierLabel = (TextView) mStatusBarWindow.findViewById(R.id.carrier_label);
             mShowCarrierInPanel = (mCarrierLabel != null);
-            if (DEBUG) Slog.v(TAG, "carrierlabel=" + mCarrierLabel + " show=" + mShowCarrierInPanel);
+            if (DEBUG)
+                Slog.v(TAG, "carrierlabel=" + mCarrierLabel + " show=" + mShowCarrierInPanel);
             if (mShowCarrierInPanel) {
                 mCarrierLabel.setVisibility(mCarrierLabelVisible ? View.VISIBLE : View.INVISIBLE);
 
@@ -805,33 +802,36 @@ public class PhoneStatusBar extends BaseStatusBar {
         } else {
             mNetworkController = new NetworkController(mContext);
             final SignalClusterView signalCluster =
-                (SignalClusterView)mStatusBarView.findViewById(R.id.signal_cluster);
+                    (SignalClusterView) mStatusBarView.findViewById(R.id.signal_cluster);
 
             mNetworkController.addSignalCluster(signalCluster);
             signalCluster.setNetworkController(mNetworkController);
 
             final boolean isAPhone = mNetworkController.hasVoiceCallingFeature();
             if (isAPhone) {
-                mEmergencyCallLabel = (TextView)mStatusBarWindow.findViewById(
-                                                       R.id.emergency_calls_only);
+                mEmergencyCallLabel = (TextView) mStatusBarWindow.findViewById(
+                        R.id.emergency_calls_only);
                 if (mEmergencyCallLabel != null) {
                     mNetworkController.addEmergencyLabelView(mEmergencyCallLabel);
                     mEmergencyCallLabel.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) { }});
+                        public void onClick(View v) {
+                        }
+                    });
                     mEmergencyCallLabel.addOnLayoutChangeListener(
-                                                    new View.OnLayoutChangeListener() {
-                        @Override
-                        public void onLayoutChange(View v, int left, int top, int right, int bottom,
-                            int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                            updateCarrierLabelVisibility(false);
-                        }});
+                            new View.OnLayoutChangeListener() {
+                                @Override
+                                public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                                           int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                                    updateCarrierLabelVisibility(false);
+                                }
+                            });
                 }
             }
 
-            mCarrierLabel = (TextView)mStatusBarWindow.findViewById(R.id.carrier_label);
+            mCarrierLabel = (TextView) mStatusBarWindow.findViewById(R.id.carrier_label);
             mShowCarrierInPanel = (mCarrierLabel != null);
             if (DEBUG) Slog.v(TAG, "carrierlabel=" + mCarrierLabel + " show=" +
-                                                                  mShowCarrierInPanel);
+                    mShowCarrierInPanel);
             if (mShowCarrierInPanel) {
                 mCarrierLabel.setVisibility(mCarrierLabelVisible ? View.VISIBLE : View.INVISIBLE);
 
@@ -1507,14 +1507,14 @@ public class PhoneStatusBar extends BaseStatusBar {
         final boolean makeVisible;
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
             makeVisible =
-                !(emergencyCallsShownElsewhere && mMSimNetworkController.isEmergencyOnly())
-                && mPile.getHeight() < (mNotificationPanel.getHeight() - mCarrierLabelHeight
-                 - mNotificationHeaderHeight) && mScrollView.getVisibility() == View.VISIBLE;
+                    !(emergencyCallsShownElsewhere && mMSimNetworkController.isEmergencyOnly())
+                            && mPile.getHeight() < (mNotificationPanel.getHeight() - mCarrierLabelHeight
+                            - mNotificationHeaderHeight) && mScrollView.getVisibility() == View.VISIBLE;
         } else {
             makeVisible =
-                !(emergencyCallsShownElsewhere && mNetworkController.isEmergencyOnly())
-                && mPile.getHeight() < (mNotificationPanel.getHeight() - mCarrierLabelHeight
-                  - mNotificationHeaderHeight)&& mScrollView.getVisibility() == View.VISIBLE;
+                    !(emergencyCallsShownElsewhere && mNetworkController.isEmergencyOnly())
+                            && mPile.getHeight() < (mNotificationPanel.getHeight() - mCarrierLabelHeight
+                            - mNotificationHeaderHeight) && mScrollView.getVisibility() == View.VISIBLE;
         }
 
         if (force || mCarrierLabelVisible != makeVisible) {
@@ -2820,7 +2820,7 @@ public class PhoneStatusBar extends BaseStatusBar {
         }
 
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
-            for(int i=0; i < MSimTelephonyManager.getDefault().getPhoneCount(); i++) {
+            for (int i = 0; i < MSimTelephonyManager.getDefault().getPhoneCount(); i++) {
                 mMSimNetworkController.dump(fd, pw, args, i);
             }
         } else {
@@ -3517,7 +3517,7 @@ public class PhoneStatusBar extends BaseStatusBar {
             if (notifiBack != null && !notifiBack.isEmpty()) {
                 background.setColorFilter(Integer.parseInt(notifiBack), Mode.SRC_ATOP);
             }
-            background.setAlpha((int) ((1-wallpaperAlpha) * 255));
+            background.setAlpha((int) ((1 - wallpaperAlpha) * 255));
         }
     }
 
@@ -3525,12 +3525,14 @@ public class PhoneStatusBar extends BaseStatusBar {
         float notifAlpha = Settings.System.getFloat(mContext.getContentResolver(), Settings.System.NOTIF_ALPHA, 0.0f);
         if (mPile != null) {
             int N = mNotificationData.size();
-            for (int i=0; i<N; i++) {
-                Entry ent = mNotificationData.get(N-i-1);
+            for (int i = 0; i < N; i++) {
+                Entry ent = mNotificationData.get(N - i - 1);
                 View expanded = ent.expanded;
-                if (expanded !=null && expanded.getBackground()!=null) expanded.getBackground().setAlpha((int) ((1-notifAlpha) * 255));
+                if (expanded != null && expanded.getBackground() != null)
+                    expanded.getBackground().setAlpha((int) ((1 - notifAlpha) * 255));
                 View large = ent.getLargeView();
-                if (large != null && large.getBackground()!=null) large.getBackground().setAlpha((int) ((1-notifAlpha) * 255));
+                if (large != null && large.getBackground() != null)
+                    large.getBackground().setAlpha((int) ((1 - notifAlpha) * 255));
             }
         }
     }

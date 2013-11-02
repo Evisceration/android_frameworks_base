@@ -26,8 +26,8 @@ class NotificationWallpaper extends FrameLayout {
 
     private final String TAG = "NotificationWallpaperUpdater";
 
-    private final String NOTIF_WALLPAPER_IMAGE_PATH = "/data/data/com.android.settings/files/notification_wallpaper.jpg";
-    private final String NOTIF_WALLPAPER_IMAGE_PATH_LANDSCAPE = "/data/data/com.android.settings/files/notification_wallpaper_landscape.jpg";
+    private final String NOTIF_WALLPAPER_IMAGE_PATH = "/data/data/net.openfiretechnologies.veloxcontrol/files/notification_wallpaper.jpg";
+    private final String NOTIF_WALLPAPER_IMAGE_PATH_LANDSCAPE = "/data/data/net.openfiretechnologies.veloxcontrol/files/notification_wallpaper_landscape.jpg";
 
     private ImageView mNotificationWallpaperImage;
     private float wallpaperAlpha;

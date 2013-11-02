@@ -22,8 +22,8 @@ public class AokpBatteryBarController extends LinearLayout {
 
     private static final String TAG = "AokpBatteryBarController";
 
-    BatteryBar mainBar;
-    BatteryBar alternateStyleBar;
+    AokpBatteryBar mainBar;
+    AokpBatteryBar alternateStyleBar;
     GlobalSettingsObserver mSettingsObserver;
 
     public static final int STYLE_REGULAR = 0;

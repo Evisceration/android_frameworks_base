@@ -65,7 +65,6 @@ import android.provider.Settings;
 import android.service.dreams.DreamService;
 import android.service.dreams.IDreamManager;
 import android.telephony.MSimTelephonyManager;
-import android.telephony.TelephonyManager;
 import android.service.notification.StatusBarNotification;
 import android.util.DisplayMetrics;
 import android.util.EventLog;
@@ -3068,11 +3067,11 @@ public class PhoneStatusBar extends BaseStatusBar {
         if (mSignalTextView != null) {
             mSignalTextView.updateSettings();
         }
-        if (mBatteryController != null) {
-            mBatteryController.updateSettings();
-        }
         if (mCircleBattery != null) {
             mCircleBattery.updateSettings();
+        }
+        if (mBatteryController != null) {
+            mBatteryController.updateSettings();
         }
         if (mCircleDockBattery != null) {
             mCircleDockBattery.updateSettings();

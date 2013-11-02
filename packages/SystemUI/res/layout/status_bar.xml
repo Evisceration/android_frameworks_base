@@ -210,9 +210,6 @@
                 />
         </com.android.systemui.statusbar.phone.TickerView>
     </LinearLayout>
-    <com.android.systemui.statusbar.policy.BatteryBar
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/battery_bar_height"/>
     <com.android.systemui.statusbar.policy.AokpBatteryBarController
         android:layout_width="match_parent"
         android:layout_height="1dp"

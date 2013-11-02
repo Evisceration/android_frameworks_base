@@ -305,10 +305,12 @@ public abstract class BaseStatusBar extends SystemUI implements
         mWindowManagerService = WindowManagerGlobal.getWindowManagerService();
         mDisplay = mWindowManager.getDefaultDisplay();
 
-        mProvisioningObserver.onChange(false); // set up
-        mContext.getContentResolver().registerContentObserver(
-                Settings.Global.getUriFor(Settings.Global.DEVICE_PROVISIONED), true,
-                mProvisioningObserver);
+        if (!isDeviceProvisioned()) {
+            mProvisioningObserver.onChange(false); // set up
+            mContext.getContentResolver().registerContentObserver(
+                    Settings.Global.getUriFor(Settings.Global.DEVICE_PROVISIONED), true,
+                    mProvisioningObserver);
+        }
 
         mSettingsObserver.observe();
 

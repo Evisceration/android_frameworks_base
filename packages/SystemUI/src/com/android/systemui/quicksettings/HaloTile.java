@@ -17,15 +17,20 @@ import com.android.systemui.statusbar.phone.QuickSettingsController;
 public class HaloTile extends QuickSettingsTile {
     private static final String TAG = "HaloTile";
     private final Context mContext;
+    private final QuickSettingsController mQsc;
 
     public HaloTile(Context context, QuickSettingsController qsc) {
         super(context, qsc);
         mContext = context;
+        mQsc = qsc;
 
         mOnClick = new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Settings.System.putInt(mContext.getContentResolver(), Settings.System.HALO_ACTIVE, !getEnabled() ? 1 : 0);
+                if (isFlipTilesEnabled()) {
+                    flipTile(0);
+                }
             }
         };
 
@@ -41,6 +46,7 @@ public class HaloTile extends QuickSettingsTile {
                 } catch (Exception ignored) {
                     Toast.makeText(mContext, "HALO App not found!", Toast.LENGTH_SHORT).show();
                 }
+                mQsc.mBar.collapseAllPanels(true);
                 return true;
             }
         };

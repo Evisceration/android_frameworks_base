@@ -1564,18 +1564,6 @@ public class NotificationManagerService extends INotificationManager.Stub {
 
         public void update() {
             ContentResolver resolver = mContext.getContentResolver();
-            mQuietHoursEnabled = Settings.System.getInt(resolver,
-                    Settings.System.QUIET_HOURS_ENABLED, 0) != 0;
-            mQuietHoursStart = Settings.System.getInt(resolver,
-                    Settings.System.QUIET_HOURS_START, 0);
-            mQuietHoursEnd = Settings.System.getInt(resolver,
-                    Settings.System.QUIET_HOURS_END, 0);
-            mQuietHoursMute = Settings.System.getInt(resolver,
-                    Settings.System.QUIET_HOURS_MUTE, 0) != 0;
-            mQuietHoursStill = Settings.System.getInt(resolver,
-                    Settings.System.QUIET_HOURS_STILL, 0) != 0;
-            mQuietHoursDim = Settings.System.getInt(resolver,
-                    Settings.System.QUIET_HOURS_DIM, 0) != 0;
         }
     }
 
@@ -2021,8 +2009,6 @@ public class NotificationManagerService extends INotificationManager.Stub {
 
         synchronized (mNotificationList) {
 
-            final boolean inQuietHours = inQuietHours();
-
             final StatusBarNotification n = new StatusBarNotification(
                     pkg, id, tag, callingUid, callingPid, score, notification, user);
             NotificationRecord r = new NotificationRecord(n);
@@ -2135,7 +2121,8 @@ public class NotificationManagerService extends INotificationManager.Stub {
                            Settings.System.NOTIFICATION_SOUND) != null;
                 } else if (!(QuietHoursUtils.inQuietHours(mContext,
                            Settings.System.QUIET_HOURS_MUTE)) && notification.sound != null) {
-                            Settings.System.NOTIFICATION_SOUND) != null;
+		            soundUri = notification.sound;
+                    hasValidSound = (soundUri != null);
                 }
 
                 if (hasValidSound) {
@@ -2180,7 +2167,7 @@ public class NotificationManagerService extends INotificationManager.Stub {
                 final boolean useDefaultVibrate =
                         (notification.defaults & Notification.DEFAULT_VIBRATE) != 0;
 
-                if (!(inQuietHours && mQuietHoursStill)
+                if (!(QuietHoursUtils.inQuietHours(mContext, Settings.System.QUIET_HOURS_MUTE))
                         && (useDefaultVibrate || convertSoundToVibration || hasCustomVibrate)
                         && !(audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT)) {
                     mVibrateNotification = r;

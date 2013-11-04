@@ -390,8 +390,7 @@ public class KeyguardHostView extends KeyguardViewBase {
                 Settings.System.LOCKSCREEN_USE_WIDGET_CONTAINER_CAROUSEL, 0) == 1) {
             mAppWidgetContainerHidden = (KeyguardWidgetPager) findViewById(R.id.app_widget_container);
             mAppWidgetContainer = (KeyguardWidgetPager) findViewById(R.id.app_widget_container_carousel);
-        }
-        else {
+        } else {
             mAppWidgetContainerHidden = (KeyguardWidgetPager) findViewById(R.id.app_widget_container_carousel);
             mAppWidgetContainer = (KeyguardWidgetPager) findViewById(R.id.app_widget_container);
         }

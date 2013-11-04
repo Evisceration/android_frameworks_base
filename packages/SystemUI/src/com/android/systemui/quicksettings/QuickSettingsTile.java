@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -107,8 +108,9 @@ public class QuickSettingsTile implements OnClickListener {
     }
 
     public boolean isFlipTilesEnabled() {
-        return (Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QUICK_SETTINGS_TILES_FLIP, 1) == 1);
+        /*return (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.QUICK_SETTINGS_TILES_FLIP, 1) == 1);*/
+        return true;
     }
 
     public void flipTile(int delay){

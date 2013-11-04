@@ -113,9 +113,9 @@ public class QuickSettingsTile implements OnClickListener {
         return true;
     }
 
-    public void flipTile(int delay){
+    public void flipTile(int delay, int mode){
         final AnimatorSet anim = (AnimatorSet) AnimatorInflater.loadAnimator(
-                mContext, R.anim.flip_right);
+                mContext, (mode == 1) ? R.anim.flip_right : R.anim.flip_left);
         anim.setTarget(mTile);
         anim.setDuration(200);
         anim.addListener(new AnimatorListener(){

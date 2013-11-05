@@ -24,6 +24,14 @@ public class AutoRotateTile extends QuickSettingsTile {
             @Override
             public void onClick(View v) {
                 RotationPolicy.setRotationLock(mContext, getAutoRotation());
+                if (isFlipTilesEnabled()) {
+                    if (getAutoRotation()) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
 
@@ -31,6 +39,7 @@ public class AutoRotateTile extends QuickSettingsTile {
             @Override
             public boolean onLongClick(View v) {
                 startSettingsActivity(Settings.ACTION_DISPLAY_SETTINGS);
+                vibrateTile(100);
                 return true;
             }
         };

@@ -89,6 +89,9 @@ public class MobileNetworkTypeTile extends QuickSettingsTile implements NetworkS
 
                 mMode = NETWORK_MODE_UNKNOWN;
                 mContext.sendBroadcast(intent);
+
+                flipTile(0, 0);
+                vibrateTile(30);
             }
         };
 
@@ -99,6 +102,7 @@ public class MobileNetworkTypeTile extends QuickSettingsTile implements NetworkS
                 intent.setClassName("com.android.phone", "com.android.phone.Settings");
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };

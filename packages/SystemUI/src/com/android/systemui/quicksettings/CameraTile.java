@@ -274,6 +274,7 @@ public class CameraTile extends QuickSettingsTile {
 
                 Intent intent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };
@@ -292,6 +293,7 @@ public class CameraTile extends QuickSettingsTile {
         } else {
             mHandler.post(mTakePictureRunnable);
         }
+        vibrateTile(30);
     }
 
     private PanelView getContainingPanel() {

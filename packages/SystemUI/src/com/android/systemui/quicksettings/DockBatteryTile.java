@@ -31,6 +31,7 @@ public class DockBatteryTile extends QuickSettingsTile implements DockBatterySta
             @Override
             public void onClick(View v) {
                 startSettingsActivity(Intent.ACTION_POWER_USAGE_SUMMARY);
+                vibrateTile(30);
             }
         };
     }

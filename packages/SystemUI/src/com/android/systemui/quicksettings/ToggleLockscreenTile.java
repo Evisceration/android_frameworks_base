@@ -34,6 +34,14 @@ public class ToggleLockscreenTile extends QuickSettingsTile
                 sDisabledLockscreen = !sDisabledLockscreen;
                 mPrefs.edit().putBoolean(KEY_DISABLED, sDisabledLockscreen).apply();
                 updateLockscreenState();
+                if (isFlipTilesEnabled()) {
+                    if (sDisabledLockscreen) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
 
@@ -42,6 +50,7 @@ public class ToggleLockscreenTile extends QuickSettingsTile
             @Override
             public boolean onLongClick(View v) {
                 startSettingsActivity("android.settings.SECURITY_SETTINGS");
+                vibrateTile(100);
                 return true;
             }
         };

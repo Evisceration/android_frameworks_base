@@ -26,6 +26,14 @@ public class WiFiDisplayTile extends QuickSettingsTile{
             @Override
             public void onClick(View v) {
                 startSettingsActivity(android.provider.Settings.ACTION_WIFI_DISPLAY_SETTINGS);
+                if (isFlipTilesEnabled()) {
+                    if (enabled) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
         qsc.registerAction(DisplayManager.ACTION_WIFI_DISPLAY_STATUS_CHANGED, this);

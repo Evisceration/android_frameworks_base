@@ -30,6 +30,14 @@ public class NetworkAdbTile extends QuickSettingsTile {
             public void onClick(View v) {
                 Settings.Secure.putInt(mContext.getContentResolver(),
                         Settings.Secure.ADB_PORT, !getEnabled() ? 5555 : -1);
+                if (isFlipTilesEnabled()) {
+                    if (getEnabled()) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
 
@@ -37,6 +45,7 @@ public class NetworkAdbTile extends QuickSettingsTile {
             @Override
             public boolean onLongClick(View v) {
                 startSettingsActivity(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS);
+                vibrateTile(100);
                 return true;
             }
         };

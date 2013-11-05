@@ -39,6 +39,14 @@ public class GPSTile extends QuickSettingsTile implements LocationGpsStateChange
             @Override
             public void onClick(View v) {
                 Settings.Secure.setLocationProviderEnabled(mContentResolver, LocationManager.GPS_PROVIDER, !enabled);
+                if (isFlipTilesEnabled()) {
+                    if (enabled) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
 
@@ -46,6 +54,7 @@ public class GPSTile extends QuickSettingsTile implements LocationGpsStateChange
             @Override
             public boolean onLongClick(View v) {
                 startSettingsActivity(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                vibrateTile(100);
                 return true;
             }
         };

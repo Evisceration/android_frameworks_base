@@ -33,6 +33,15 @@ public class AirplaneModeTile extends QuickSettingsTile implements NetworkSignal
                 Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
                 intent.putExtra("state", !enabled);
                 mContext.sendBroadcast(intent);
+
+                if (isFlipTilesEnabled()) {
+                    if (enabled) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
         mOnLongClick = new OnLongClickListener() {
@@ -40,6 +49,7 @@ public class AirplaneModeTile extends QuickSettingsTile implements NetworkSignal
             @Override
             public boolean onLongClick(View v) {
                 startSettingsActivity(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
+                vibrateTile(100);
                 return true;
             }
         };

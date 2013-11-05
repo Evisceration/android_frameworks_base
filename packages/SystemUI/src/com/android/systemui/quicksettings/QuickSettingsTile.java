@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemProperties;
 import android.os.UserHandle;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,7 @@ public class QuickSettingsTile implements OnClickListener {
     protected PhoneStatusBar mStatusbarService;
     protected QuickSettingsController mQsc;
     protected SharedPreferences mPrefs;
+    protected Vibrator mVibrator;
     private Handler mHandler = new Handler();
 
     public QuickSettingsTile(Context context, QuickSettingsController qsc) {
@@ -56,6 +58,7 @@ public class QuickSettingsTile implements OnClickListener {
         mQsc = qsc;
         mTileLayout = layout;
         mPrefs = mContext.getSharedPreferences("quicksettings", Context.MODE_PRIVATE);
+        mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     public void setupQuickSettingsTile(LayoutInflater inflater,
@@ -104,6 +107,19 @@ public class QuickSettingsTile implements OnClickListener {
         ImageView image = (ImageView) mTile.findViewById(R.id.image);
         if (image != null) {
             image.setImageResource(mDrawable);
+        }
+    }
+
+    public boolean isVibrationEnabled() {
+        /*return (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.QUICK_SETTINGS_TILES_VIBRATE, 1) == 1);*/
+        return true;
+    }
+
+    public void vibrateTile(int duration) {
+        if (!isVibrationEnabled()) return;
+        if (mVibrator != null) {
+            if (mVibrator.hasVibrator()) mVibrator.vibrate(duration);
         }
     }
 

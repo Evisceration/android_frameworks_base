@@ -30,6 +30,14 @@ public class WiFiTile extends QuickSettingsTile implements NetworkSignalChangedC
             public void onClick(View v) {
                 WifiManager wfm = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
                 wfm.setWifiEnabled(!wfm.isWifiEnabled());
+                if (isFlipTilesEnabled()) {
+                    if (wfm.isWifiEnabled()) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
         mOnLongClick = new OnLongClickListener() {
@@ -37,6 +45,7 @@ public class WiFiTile extends QuickSettingsTile implements NetworkSignalChangedC
             @Override
             public boolean onLongClick(View v) {
                 startSettingsActivity(android.provider.Settings.ACTION_WIFI_SETTINGS);
+                vibrateTile(100);
                 return true;
             }
         };

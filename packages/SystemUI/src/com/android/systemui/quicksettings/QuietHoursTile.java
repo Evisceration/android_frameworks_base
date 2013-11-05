@@ -25,6 +25,14 @@ public class QuietHoursTile extends QuickSettingsTile {
             public void onClick(View v) {
                 Settings.System.putIntForUser(mContext.getContentResolver(), Settings.System.QUIET_HOURS_ENABLED,
                         mEnabled ? 0 : 1, UserHandle.USER_CURRENT);
+                if (isFlipTilesEnabled()) {
+                    if (mEnabled) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
         mOnLongClick = new View.OnLongClickListener() {
@@ -33,6 +41,7 @@ public class QuietHoursTile extends QuickSettingsTile {
                 Intent intent = new Intent(Intent.ACTION_MAIN);
                 intent.setClassName("com.android.settings", "com.android.settings.Settings$QuietHoursSettingsActivity");
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };

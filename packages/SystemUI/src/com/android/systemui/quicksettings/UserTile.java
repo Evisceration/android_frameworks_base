@@ -61,6 +61,9 @@ public class UserTile extends QuickSettingsTile {
                         Log.e(TAG, "Couldn't show user switcher", e);
                     }
                 }
+                if (isFlipTilesEnabled())
+                    flipTile(0, 0);
+                vibrateTile(30);
             }
         };
         qsc.registerAction(Intent.ACTION_USER_SWITCHED, this);

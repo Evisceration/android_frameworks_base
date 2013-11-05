@@ -37,6 +37,9 @@ public class ScreenTimeoutTile extends QuickSettingsTile {
             public void onClick(View v) {
                 toggleState();
                 updateResources();
+                if (isFlipTilesEnabled())
+                    flipTile(0, 0);
+                vibrateTile(30);
             }
         };
 
@@ -45,6 +48,7 @@ public class ScreenTimeoutTile extends QuickSettingsTile {
             public boolean onLongClick(View v) {
                 Intent intent = new Intent("android.settings.DISPLAY_SETTINGS");
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };

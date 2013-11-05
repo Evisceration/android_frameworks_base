@@ -31,6 +31,7 @@ public class LteTile extends QuickSettingsTile {
             public void onClick(View v) {
                 toggleLteState();
                 updateResources();
+                vibrateTile(30);
             }
         };
 
@@ -41,6 +42,7 @@ public class LteTile extends QuickSettingsTile {
                 intent.setClassName("com.android.phone", "com.android.phone.Settings");
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };

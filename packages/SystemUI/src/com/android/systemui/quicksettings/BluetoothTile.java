@@ -37,6 +37,14 @@ public class BluetoothTile extends QuickSettingsTile implements BluetoothStateCh
                 }else{
                     mBluetoothAdapter.enable();
                 }
+                if (isFlipTilesEnabled()) {
+                    if (enabled) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
 
@@ -45,6 +53,7 @@ public class BluetoothTile extends QuickSettingsTile implements BluetoothStateCh
             @Override
             public boolean onLongClick(View v) {
                 startSettingsActivity(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+                vibrateTile(100);
                 return true;
             }
         };

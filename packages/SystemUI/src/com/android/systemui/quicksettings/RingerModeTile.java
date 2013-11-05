@@ -45,6 +45,9 @@ public class RingerModeTile extends QuickSettingsTile {
             public void onClick(View v) {
                 toggleState();
                 updateResources();
+                if (isFlipTilesEnabled())
+                    flipTile(0, 0);
+                vibrateTile(30);
             }
         };
 
@@ -52,6 +55,7 @@ public class RingerModeTile extends QuickSettingsTile {
             @Override
             public boolean onLongClick(View v) {
                 startSettingsActivity(android.provider.Settings.ACTION_SOUND_SETTINGS);
+                vibrateTile(100);
                 return true;
             }
         };

@@ -28,6 +28,14 @@ public class ExpandedDesktopTile extends QuickSettingsTile {
                 Settings.System.putIntForUser(mContext.getContentResolver(),
                         Settings.System.EXPANDED_DESKTOP_STATE, mEnabled ? 0 : 1,
                         UserHandle.USER_CURRENT);
+                if (isFlipTilesEnabled()) {
+                    if (mEnabled) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
 
@@ -38,6 +46,7 @@ public class ExpandedDesktopTile extends QuickSettingsTile {
                 intent.setClassName("com.android.settings",
                         "com.android.settings.Settings$SystemSettingsActivity");
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };

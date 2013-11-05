@@ -28,13 +28,18 @@ public class WifiAPTile extends QuickSettingsTile {
                 switch (state) {
                     case WifiManager.WIFI_AP_STATE_ENABLING:
                     case WifiManager.WIFI_AP_STATE_ENABLED:
+                        if (isFlipTilesEnabled())
+                            flipTile(0, 0);
                         setSoftapEnabled(false);
                         break;
                     case WifiManager.WIFI_AP_STATE_DISABLING:
                     case WifiManager.WIFI_AP_STATE_DISABLED:
+                        if (isFlipTilesEnabled())
+                            flipTile(0, 1);
                         setSoftapEnabled(true);
                         break;
                 }
+                vibrateTile(30);
             }
         };
         mOnLongClick = new View.OnLongClickListener() {
@@ -43,6 +48,7 @@ public class WifiAPTile extends QuickSettingsTile {
                 Intent intent = new Intent(Intent.ACTION_MAIN);
                 intent.setClassName("com.android.settings", "com.android.settings.TetherSettings");
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };

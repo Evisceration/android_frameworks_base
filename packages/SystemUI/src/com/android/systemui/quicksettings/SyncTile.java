@@ -24,6 +24,14 @@ public class SyncTile extends QuickSettingsTile {
             public void onClick(View v) {
                 toggleState();
                 updateResources();
+                if (isFlipTilesEnabled()) {
+                    if (getSyncState()) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
 
@@ -34,6 +42,7 @@ public class SyncTile extends QuickSettingsTile {
                 intent.addCategory(Intent.CATEGORY_DEFAULT);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };

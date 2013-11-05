@@ -29,6 +29,14 @@ public class UsbTetherTile extends QuickSettingsTile {
                 if (mUsbConnected) {
                     setUsbTethering(!mUsbTethered);
                 }
+                if (isFlipTilesEnabled()) {
+                    if (mUsbConnected) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
         mOnLongClick = new View.OnLongClickListener() {
@@ -37,6 +45,7 @@ public class UsbTetherTile extends QuickSettingsTile {
                 Intent intent = new Intent(Intent.ACTION_MAIN);
                 intent.setClassName("com.android.settings", "com.android.settings.TetherSettings");
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };

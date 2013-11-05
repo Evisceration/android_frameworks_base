@@ -27,6 +27,7 @@ public class BrightnessTile extends QuickSettingsTile implements BrightnessState
             public void onClick(View v) {
                 qsc.mBar.collapseAllPanels(true);
                 showBrightnessDialog();
+                vibrateTile(30);
             }
         };
 
@@ -34,6 +35,7 @@ public class BrightnessTile extends QuickSettingsTile implements BrightnessState
             @Override
             public boolean onLongClick(View v) {
                 startSettingsActivity(Settings.ACTION_DISPLAY_SETTINGS);
+                vibrateTile(100);
                 return true;
             }
 

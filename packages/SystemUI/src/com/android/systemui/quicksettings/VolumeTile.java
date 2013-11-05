@@ -24,6 +24,9 @@ public class VolumeTile extends QuickSettingsTile {
                 qsc.mBar.collapseAllPanels(true);
                 AudioManager am = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
                 am.adjustVolume(AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+                if (isFlipTilesEnabled())
+                    flipTile(0, 0);
+                vibrateTile(30);
             }
         };
 
@@ -32,6 +35,7 @@ public class VolumeTile extends QuickSettingsTile {
             @Override
             public boolean onLongClick(View view) {
                 startSettingsActivity(android.provider.Settings.ACTION_SOUND_SETTINGS);
+                vibrateTile(100);
                 return true;
             }
         };

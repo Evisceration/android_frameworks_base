@@ -51,6 +51,14 @@ public class MobileNetworkTile extends QuickSettingsTile implements NetworkSigna
                     updateOverlayImage(DISABLED_OVERLAY);
                     mCm.setMobileDataEnabled(false);
                 }
+                if (isFlipTilesEnabled()) {
+                    if (mCm.getMobileDataEnabled()) {
+                        flipTile(0, 0);
+                    } else {
+                        flipTile(0, 1);
+                    }
+                }
+                vibrateTile(30);
             }
         };
 
@@ -62,6 +70,7 @@ public class MobileNetworkTile extends QuickSettingsTile implements NetworkSigna
                         "com.android.settings",
                         "com.android.settings.Settings$DataUsageSummaryActivity"));
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };

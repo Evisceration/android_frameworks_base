@@ -25,6 +25,7 @@ public class NfcTile extends QuickSettingsTile {
             public void onClick(View v) {
                 toggleState();
                 updateResources();
+                vibrateTile(30);
             }
         };
 
@@ -35,6 +36,7 @@ public class NfcTile extends QuickSettingsTile {
                 intent.addCategory(Intent.CATEGORY_DEFAULT);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startSettingsActivity(intent);
+                vibrateTile(100);
                 return true;
             }
         };
@@ -64,10 +66,14 @@ public class NfcTile extends QuickSettingsTile {
         switch (state) {
             case NfcAdapter.STATE_TURNING_ON:
             case NfcAdapter.STATE_ON:
+                if (isFlipTilesEnabled())
+                    flipTile(0, 0);
                 mNfcAdapter.disable();
                 break;
             case NfcAdapter.STATE_TURNING_OFF:
             case NfcAdapter.STATE_OFF:
+                if (isFlipTilesEnabled())
+                    flipTile(0, 0);
                 mNfcAdapter.enable();
                 break;
         }

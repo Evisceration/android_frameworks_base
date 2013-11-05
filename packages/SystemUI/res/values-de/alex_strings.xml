@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--ScreenShot Trash-->
+    <string name="trash">Löschen</string>
+
+    <!-- Halo -->
+    <!-- Content description of the halo button in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
+    <string name="accessibility_halo">Create notification Halo.</string>
+
+    <string name="halo_dismiss">Benachrichtigung entfernen</string>
+    <string name="halo_hide">Halo verstecken</string>
+    <string name="halo_clear_all">Alle Benachrichtigungen entfernen</string>
+    <string name="halo_silence">Verstecken &amp; stummschalten</string>
+
+    <string name="halo_tutorial1">Das ist Halo</string>
+    <string name="halo_tutorial2">Bewege mich: 2x-tippen &amp; ziehen</string>
+    <string name="halo_tutorial3">Browse tasks: Horizontal drag</string>
+
+    <string name="halo_battery_plugged">LADEN</string>
+    <string name="halo_battery_unplugged">ENTLADEN</string>
+    <string name="halo_battery_full">VOLL</string>
+    <string name="halo_aeroplane1">FLUGZEUG</string>
+    <string name="halo_aeroplane2">MODUS</string>
+    <string name="halo_wifi_on">WLAN EIN</string>
+    <string name="halo_wifi_off">WLAN AUS</string>
+    <string name="halo_signal_bars_4">VOLL</string>
+    <string name="halo_signal_bars_3">DREI BALKEN</string>
+    <string name="halo_signal_bars_2">ZWEI BALKEN</string>
+    <string name="halo_signal_bars_1">EIN BALKEN</string>
+    <string name="halo_signal_bars_none">KEINE BALKEN</string>
+
+    <!-- Halo QuickTile -->
+    <string name="quick_settings_halo_enabled_label">Halo aktiviert</string>
+    <string name="quick_settings_halo_disabled_label">Halo deaktiviert</string>
+
+    <!-- Title shown in recents popup for showing app in floating mode -->
+    <string name="status_bar_recent_floating_item_title">Floating mode</string>
+
+    <!-- Title shown in notification popup for launching notification in floating mode -->
+    <string name="status_bar_notification_floating_item_title">Floating mode</string>
+
+</resources>

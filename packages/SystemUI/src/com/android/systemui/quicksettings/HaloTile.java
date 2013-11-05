@@ -35,6 +35,7 @@ public class HaloTile extends QuickSettingsTile {
                         flipTile(0, 1);
                     }
                 }
+                vibrateTile(30);
             }
         };
 
@@ -50,6 +51,7 @@ public class HaloTile extends QuickSettingsTile {
                 } catch (Exception ignored) {
                     Toast.makeText(mContext, "HALO App not found!", Toast.LENGTH_SHORT).show();
                 }
+                vibrateTile(100);
                 mQsc.mBar.collapseAllPanels(true);
                 return true;
             }
